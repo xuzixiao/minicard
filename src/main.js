@@ -3,8 +3,14 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import Axios from 'axios'
 import Vant from 'vant'
+import Cookie from './cookie'
 import 'vant/lib/index.css'
+
+Vue.prototype.$axios=Axios;
+Vue.prototype.$cookie=Cookie;
+
 Vue.config.productionTip = false
 Vue.use(Vant)
 /* eslint-disable no-new */

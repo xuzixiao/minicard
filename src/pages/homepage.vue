@@ -3,10 +3,10 @@
         <van-nav-bar title="正阳堂微名片管理中心"/>
         <div class="home-tit">
             <dl>
-                <dt> <img src="static/images/morenheadimg.png" /></dt>
+                <dt> <img :src="userinfo.headimg==null||userinfo.headimg==''?'static/images/morenheadimg.png':userinfo.headimg" /></dt>
                 <dd>
-                    <p class="username">用户名</p>
-                    <p>莫愁前路无知己，天下谁人不识君！</p>
+                    <p class="username">{{userinfo.name==''||userinfo.name==null?userinfo.mobile:userinfo.name}}</p>
+                    <p>{{userinfo.dictum==null||userinfo.dictum==''?'您还没填写您的宣言~':userinfo.dictum}}</p>
                 </dd>
             </dl>
         </div>
@@ -42,8 +42,42 @@ export default {
             {"menutit":"通讯录","path":"/myrecord","iconclass":"contact"},
             {"menutit":"我的收藏","path":"/mycollect","iconclass":"shop-collect"},
             {"menutit":"个人中心","path":"/myspace","iconclass":"pending-deliver"}
-        ]
+        ],
+        userinfo:""
     }
+  },
+  computed:{
+
+  },
+  created:function(){
+
+  },
+  methods:{
+      getuserinfo:function(){
+          var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            if(user==null){
+                this.$router.push="/login";
+            }
+          this.$axios({
+              url:"/api/getuseinfo",
+              method:"POST",
+              data:{
+                  username:user
+              }
+          }).then((res)=>{
+              console.log(res);
+              if(res.data.code==100){
+                  this.userinfo=res.data.userinfo;
+              }else{
+                  console.log("====获取用户信息失败====");
+              }
+          },(res)=>{
+                 console.log("====获取用户信息失败====");
+          })
+      }
+  },
+  mounted:function(){
+        this.getuserinfo();
   }
 };
 </script>

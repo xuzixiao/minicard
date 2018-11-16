@@ -52,7 +52,7 @@ export default {
             this.$router.push("/home");
         },
         choose:function(){
-            this.$router.push("/page")
+            this.$router.push("/choosepage")
         }
     }
 }

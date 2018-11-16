@@ -6,7 +6,7 @@
         
         <div class="card-main">
             <van-field
-                v-model="username"
+                v-model="logininfo.username"
                 required
                 clearable
                 label="手机号"
@@ -14,7 +14,7 @@
             />
 
             <van-field
-                v-model="password"
+                v-model="logininfo.password"
                 type="password"
                 label="密码"
                 placeholder="请输入密码"
@@ -23,7 +23,7 @@
             <p class="tiptext">
                 <router-link to="/register">没有账号？去注册</router-link>
             </p>
-            <van-button type="primary" size="large" class="loginbtn">登录</van-button>
+            <van-button type="primary" size="large" class="loginbtn" @click="loginfun">登录</van-button>
         </div>
     </div>
 </template>
@@ -31,12 +31,48 @@
 export default {
     data(){
         return{
-            username:"",
-            password:""
+            logininfo:{
+                username:"",
+                password:""
+            },
         }
     },
-    mounted:()=>{
-        
+    methods:{
+        loginfun:function(){
+            if(this.logininfo.username==""||this.logininfo.password==""){
+                this.$toast("请您输入账号密码后登录");
+                return;
+            }
+            if(!(/^1[345678]\d{9}$/.test(this.logininfo.username))){ 
+                this.$toast("手机号码有误，请重填");  
+                return false; 
+            } 
+         this.$toast.loading({forbidClick: true});
+            this.$axios({
+                url:"/api/userlogin",
+                method:"POST",
+                data:this.logininfo
+            }).then((res)=>{
+                this.$toast.clear();
+                console.log(this);
+                if(res.data.code==0){
+                    this.$toast(res.data.msg)
+                }else if(res.data.code==100){
+                    this.$toast.success(res.data.msg);
+                    this.$router.push("/home");
+                }
+            },(res)=>{
+                this.$toast.clear();
+                this.$toast("系统错误,请您稍后重试")
+            })
+            }
+
+    },
+    mounted:function(){
+         this.$axios({
+                url:"/api/loginout",
+                method:"POST"
+            })
     }
 }
 </script>

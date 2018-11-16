@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import cookie from '@/cookie'
 //404
 import Error from '@/pages/error'
 //注册
@@ -30,91 +31,146 @@ import Createpage from '@/pages/createpage'
 import Writing from '@/pages/writing'
 //我的单页
 import page from '@/pages/page'
-
+//管理中心登录
+import adminlogin from '@/admin/login'
+//管理中心主页
+import adminmain from '@/admin/main'
 
 Vue.use(Router)
 
-export default new Router({
-  mode:"history",
+const router = new Router({
+  mode: "history",
   routes: [
     {
       path: '*',
       name: 'Error',
-      component: Error
+      component: Error,
+      meta: { requireAuth: true }
     },
     {
       path: '/',
       name: 'index',
-      component:Login
+      component: Login,
+      meta: { requireAuth: true }
     },
     {
       path: '/Login',
       name: 'Login',
-      component:Login
+      component: Login,
+      meta: { requireAuth: false }
     },
     {
       path: '/register',
       name: 'register',
-      component:Register
+      component: Register,
+      meta: { requireAuth: false }
     },
     {
       path: '/home',
       name: 'home',
-      component: Home
+      component: Home,
+      meta: { requireAuth: true }
     },
     {
       path: '/mycard',
       name: 'mycard',
-      component: Mycard
+      component: Mycard,
+      meta: { requireAuth: true }
     },
     {
       path: '/myarticle',
       name: 'myarticle',
-      component: Myarticle
+      component: Myarticle,
+      meta: { requireAuth: true }
     },
     {
       path: '/mypage',
       name: 'mypage',
-      component: Mypage
+      component: Mypage,
+      meta: { requireAuth: true }
     },
     {
       path: '/myurl',
       name: 'myurl',
-      component: Myurl
+      component: Myurl,
+      meta: { requireAuth: true }
     },
     {
       path: '/myrecord',
       name: 'myrecord',
-      component: Myrecord
+      component: Myrecord,
+      meta: { requireAuth: true }
     },
     {
       path: '/mycollect',
       name: 'mycollect',
-      component: Mycollect
+      component: Mycollect,
+      meta: { requireAuth: true }
     },
     {
       path: '/myspace',
       name: 'myspace',
-      component: Myspace
+      component: Myspace,
+      meta: { requireAuth: true }
     },
     {
       path: '/createpage',
       name: 'createpage',
-      component: Createpage
+      component: Createpage,
+      meta: { requireAuth: true }
     },
     {
       path: '/choosepage',
       name: 'choosepage',
-      component: Choosepage
+      component: Choosepage,
+      meta: { requireAuth: true }
     },
     {
       path: '/writing',
       name: 'Writing',
-      component: Writing
-    },{
+      component: Writing,
+      meta: { requireAuth: true }
+    }, {
       path: '/page',
       name: 'page',
-      component: page
+      component: page,
+      meta: { requireAuth: true }
+    }, {
+      path: "/admin",
+      name: "admin",
+      component: adminmain,
+      meta: { requireAuth: false },
+      children: [
+        {
+          path: "login",
+          name: "adminlogin",
+          component: adminlogin
+        }
+      ]
     }
   ]
 })
+
+
+
+//路由验证
+router.beforeEach((to, from, next) => {
+  var loginstate = cookie.getCookie("loginstate");
+  if (to.path === '/login') {//当进入的是登录页面时
+    next()
+  } else { //当进入的是不是登录页面时
+    if (!loginstate && to.meta.requireAuth) {
+      next(
+        {
+          path: '/login',
+          query: {
+            'path': from.fullPath
+          }
+        }
+      )
+    } else {
+      next()
+    }
+  }
+})
+export default router;
