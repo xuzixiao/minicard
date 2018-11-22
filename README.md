@@ -1,27 +1,15 @@
-# minicard
+项目名称:迷你名片
 
-> A Vue.js project
+技术栈:Vue,vue-route,vuex,node,express,mysql
+开发人员:xuyuanye(个人全栈项目)
 
-## Build Setup
+功能模块:
+1.注册        √
+2.登录        √
+3.我的名片     √
+4.我的文章   --
+5.微单页     --
 
-``` bash
-# install dependencies
-npm install
 
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run all tests
-npm test
-```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+开发日志:
+2018-11-22:完成我的文章板块,上传图片,选择图片功能.
