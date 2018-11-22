@@ -18,54 +18,18 @@
     </van-col>
   </van-row>
 
-    <div class="art-list">
-
+    <div v-cloak class="art-list"  v-if="havecategory">
         <van-row gutter='10'>
-            <van-col span="8">
-                <div class="navlist">
+            <van-col span="8" v-for="(item,index) in category" :key="index">
+                <div class="navlist" @click="choosecategory(item.id)">
                     <van-icon name="tosend" />
-                    <p>新闻中心</p>
+                    <p>{{item.categoryname}}</p>
                 </div>
             </van-col>
-
-            <van-col span="8">
-                <div class="navlist">
-                    <van-icon name="tosend" />
-                    <p>新闻中心中</p>
-                </div>
-            </van-col>
-
-            <van-col span="8">
-                <div class="navlist">
-                    <van-icon name="tosend" />
-                    <p>新闻中心</p>
-                </div>
-            </van-col>
-
-            <van-col span="8">
-                <div class="navlist">
-                    <van-icon name="tosend" />
-                    <p>新闻中心</p>
-                </div>
-            </van-col>
-
-            <van-col span="8">
-                <div class="navlist">
-                    <van-icon name="tosend" />
-                    <p>新闻中心中心</p>
-                </div>
-            </van-col>
-
-
-
-
-
         </van-row>
-
-
     </div>
 
-    <div class="art-none">
+    <div v-cloak class="art-none" v-if="!havecategory">
         <van-icon name="info-o"/>
         <p>暂无分类</p>
     </div>
@@ -78,8 +42,8 @@
             <span>添加分类</span>
             <van-icon name="close" @click="show=false" />    
         </p>
-        <van-field v-model="username" label="分类名称" placeholder="请输入分类名称" />
-        <van-button size="large" class="savecard">添加分类</van-button>
+        <van-field v-model="categoryname" label="分类名称" placeholder="请输入分类名称" />
+        <van-button size="large" class="savecard" @click="setcategory">添加分类</van-button>
     </div>
 </van-popup>
 
@@ -93,18 +57,98 @@ export default {
     data(){
         return{
             pagetitle:"我的文章",
-            show:false
-
+            show:false,
+            categoryname:"",//分类名称
+            category:[],
+        }
+    },
+    computed:{
+        havecategory:function(){
+            if(this.category.length==0){
+                return false
+            }else{
+                return true
+            }
         }
     },
     methods:{
         back:function(){
             this.$router.push("/home");
+        },
+        getcategory:function(){
+            var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            if(user==null){
+                this.$router.push="/login";
+            }
+            this.$axios({
+                url:"/api/article/getcategory",
+                method:"POST",
+                data:{
+                    username:user
+                }
+            }).then((res)=>{
+                if(res.data.code==100){
+                    if(res.data.data.length==0){
+                        this.category=[]
+                    }else{
+                        this.category=res.data.data;
+                    }
+                }else{
+                     this.$toast(res.data.data);
+                }
+            },(res)=>{
+                console.log("====获取文章分类失败====");
+            })
+        },
+        setcategory:function(){
+            var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            if(user==null){
+                this.$router.push="/login";
+            }
+            this.$axios({
+                url:"/api/article/setcategory",
+                method:"POST",
+                data:{
+                    categoryname:this.categoryname,
+                    userid:user
+                }
+            }).then(
+                (res)=>{
+                    if(res.data.code==0){
+                        this.$toast(res.data.data);
+                    }else{
+                        this.$toast("添加成功");
+                        var vm=this;
+                        setTimeout(()=>{
+                            vm.show=false;
+                            vm.categoryname="";
+                            vm.getcategory();
+                        },600)
+                    }
+                },
+                (res)=>{
+                    this.$toast("添加分类失败");
+                }
+            )
+        },
+        choosecategory:function(id){//选择此分类
+            this.$router.push({
+                path:"/writing",
+                query:{
+                    categoryid:id
+                }
+            })
         }
+    },
+    created:function(){
+        this.getcategory();
     }
 }
 </script>
 <style scoped>
+[v-cloak]{
+  display: none!important;
+}
 .art-mian{
     padding: 0 10px;
 }

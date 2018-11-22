@@ -57,7 +57,7 @@ export default {
             }
             this.$toast.loading({forbidClick: true});
                this.$axios({
-                url:"/api/userreg",
+                url:"/api/user/userreg",
                 method:"POST",
                 data:this.reguserinfo
             }).then((res)=>{

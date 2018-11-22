@@ -1,44 +1,152 @@
 <template>
     <div class="main">
         <van-nav-bar 
-        title="写文章" 
-        left-text="返回"
+        title="发布文章" 
+        left-text=""
         left-arrow
-        @click-left="back"
+        @click-left="$router.go(-1)"
         />
 
         <div class="box">
-            <van-cell-group>
-                <van-field v-model="username" label="文章标题" placeholder="请输入用户名" />
-                <van-field v-model="username" label="头部图片" placeholder="请输入手机号" />
-                <van-field v-model="username" label="设为推荐" placeholder="请输入微信号" />
-                <van-field v-model="username" label="文章内容" rows="3" type="textarea" autosize placeholder="文章内容" />
-            </van-cell-group>
             
-            <van-button size="large" class="savecard">保存文章</van-button>
+            <div class="uploadbgimg">
+                <div class="text"><van-icon name="photo" class="texticon" />上传封面图片</div>
+                <img :src="artbanner"  v-if="hasbannerimg" class="uploadimg" />
+                <van-uploader :after-read="uploadheadimg"  class="choosefile"></van-uploader>
+            </div>
 
+            <div class="line">
+                <div class="line-label"><span>文章类别</span></div>
+                <div class="line-main">
+                    <van-field  :value="categoryname" placeholder="请选择文章类别" readonly  class="input" @click="chooseartfl=true" />
+                </div>
+            </div>
+
+            <div class="line">
+                <div class="line-label"><span>文章标题</span></div>
+                <div class="line-main">
+                    <van-field  value="" type="textarea" autosize class="input" />
+                </div>
+            </div>
+
+            <div class="line tuijian">
+                <div class="line-label"><span>是否设为推荐</span></div>
+                <div class="line-main">
+                    <van-switch v-model="checked"  size="20px"/>
+                </div>
+            </div>
+            
+            <div class="line">
+                <div class="line-label"><span>文章内容</span></div>
+                <div class="line-main articlemain">
+                  
+                  <Created-Aritle></Created-Aritle>
+
+                </div>
+            </div>
+            <van-button size="large" class="savecard">保存文章</van-button>
         </div>
+
+
+    <van-actionsheet v-model="chooseartfl" title="请选择文章分类">
+        <ul class="artflbox">
+            <li v-for="item in category" :key="item.id" @click="findthisfl(item.id)" >
+                {{item.categoryname}}
+            </li>
+        </ul>
+    </van-actionsheet>
+
     </div>
 </template>
 <script>
+import CreatedAritle from '@/components/creatarticle'
 export default {
     data(){
         return{
-            username:""
-
+            artbanner:"",
+            articletit:"",
+            checked:false,
+            chooseartfl:false,
+            categoryid:"",
+            //categoryname:"",
+            category:"",//文章分类
         }
     },
-    methods:{
-        back:function(){
-            this.$router.push("/home")
+    computed:{
+        hasbannerimg:function(){
+            if(this.artbanner==""){
+                return false
+            }else{
+                return true
+            }
+        },
+        categoryname:function(){
+            for(let i=0;i<this.category.length;i++){
+                if(this.category[i].id==this.categoryid){
+                    return this.category[i].categoryname
+                }
+            }
         }
+    },
+    components:{
+        "Created-Aritle":CreatedAritle
+    },
+    methods:{
+        uploadheadimg:function(e){
+          
+        },
+        getcategory:function(){
+            var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            if(user==null){
+                this.$router.push="/login";
+            }
+            this.$axios({
+                url:"/api/article/getcategory",
+                method:"POST",
+                data:{
+                    username:user
+                }
+            }).then((res)=>{
+                if(res.data.code==100){
+                    if(res.data.data.length==0){
+                        this.$toast('您还没有创建文章分类,创建分类后才能写文章哦~');
+                       var vm=this;
+                       setTimeout(function(){
+                           vm.$router.go(-1);
+                       },1000)
+                    }else{
+                        this.category=res.data.data;
+                    }
+                }else{
+                        this.$toast(res.data.data);
+                }
+            },(res)=>{
+                console.log("====获取文章分类失败====");
+            })
+        },
+        findthisfl:function(categoryid){
+            this.categoryid=categoryid;
+            this.chooseartfl=false;
+        }
+    },
+    created:function(){
+        if(this.$route.query.categoryid){
+            this.categoryid=this.$route.query.categoryid;
+        }
+        this.getcategory();
+    },
+    mounted:function(){
+
     }
 }
 </script>
 
 <style scoped>
+.main{
+    width: 100%;
+}
 .box{
-    padding: 10px;
+    padding: 10px 15px;
 }
 .userheadimg{
     border-bottom: #eee solid 0px;
@@ -66,5 +174,99 @@ export default {
     border:none;
     border-radius:5px;
     margin: 20px auto 40px;
+}
+.line{
+    width: 100%;
+    height: auto;
+}
+.line-label{
+    width: 100%;
+    height:40px;
+    line-height: 40px;
+}
+.line-label span{
+    color: #333;
+    font-size: 14px;
+}
+.line-main .input{
+    border:#ececec solid 0.5px;
+    border-radius: 3px;
+}
+.bgimg{
+display: flex;
+flex-wrap: wrap;
+}
+.bgimg img{
+    width: 50%;
+    height: 100px;
+}
+.bgimg button{
+    width: 30%;
+    height: 30px;
+    background: #6da0ed;
+    color: #fff;
+    border:none;
+    border-radius: 5px;
+    margin: 10%;
+}
+.uploadbgimg{
+    width: 100%;
+    height: 110px;
+    border-radius: 5px;
+    border: #d5d5d5 dashed 1px;
+    position: relative;
+}
+.uploadbgimg .text{
+    text-align: center;
+    font-size: 14px;
+    color: #d5d5d5;
+    line-height: 30px;
+    margin-top: 40px;
+}
+.uploadbgimg .texticon{
+    margin-right: 10px;
+}
+
+.tuijian {
+    height: 40px;
+}
+.tuijian .line-label{
+    width: 60%;
+    float: left;
+}
+.tuijian .line-main{
+    width: 40%;
+    float: left;
+    height: 20px;
+    text-align: right;
+    margin-top: 10px;
+}
+.uploadimg{
+    position:absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 10;
+}
+.choosefile{
+    position:absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    z-index: 11;
+}
+.artflbox li{
+    padding:0 20px;
+    line-height: 50px;
+    color: #333;
+    font-size: 14px;
+}
+.articlemain{
+    border: #ebebeb dashed 1px;
+    padding:10px 10px 30px;
+    border-radius: 5px;
 }
 </style>

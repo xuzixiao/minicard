@@ -7,7 +7,7 @@ const {aesEncrypt,aesDecrypt} = require("./crypto");//加载封装加密模块
 
 
 //配置cookie session 过期时间
-var expiretime=60000*10;//过期时间10分钟
+var expiretime=60000*100;//过期时间100分钟
 
 //创建连接池
 var pool = mysql.createPool(models.mysql)
@@ -126,7 +126,7 @@ router.post('/loginout',(req,res) => {
     })
 })
 
-//获取用户登录信息
+//获取用户信息
 router.post('/getuseinfo',(req,res) => {
     var sql = $sql.user.userinfo;//获取用户信息
     var params = req.body;
@@ -148,6 +148,40 @@ router.post('/getuseinfo',(req,res) => {
             conn.release();
         })
     })
+})
+
+//保存名片信息
+router.post('/savecardinfo',(req,res) =>{
+    var sql=$sql.user.savecardinfo;
+    var params = req.body;
+    // name=?,headimg=?,wechat=?,company=?,branch=?,office=?,dictum=?,address=?,operate=? WHERE mobile=?
+
+    if(req.session.loginstate==null || req.session.loginstate==undefined){
+        res.json({
+            code:50,
+            data:"登录失效"
+        })
+        return;
+    }
+    var mobile=req.session.loginstate.user;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(sql,[params.name,params.headimg,params.wechat,params.company,params.branch,params.office,params.dictum,params.address,params.operate,mobile], function(err, result) {
+                if (err) {
+                    res.json({
+                        code:0,
+                        data:"请求数据失败"
+                    });
+                }else{
+                    res.json({
+                        code:100,
+                        data:"保存成功"
+                    })
+                }
+            conn.release();
+        })
+    })
+
 })
       
 

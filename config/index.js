@@ -18,7 +18,14 @@ module.exports = {
           pathRewrite: {                
               '^/api': ''
           }
-      }
+      },
+      '/uploadfile': {
+        target: 'http://127.0.0.1:3000/uploadfile/',
+        changeOrigin: true,
+        pathRewrite: {                
+            '^/uploadfile': ''
+        }
+    }
   },
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST

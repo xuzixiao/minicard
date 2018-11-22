@@ -69,7 +69,10 @@ const router = new Router({
       path: '/home',
       name: 'home',
       component: Home,
-      meta: { requireAuth: true }
+      meta: { 
+        requireAuth: true,
+        keepAlive:true,// 是否需要缓存,缓存后返回页面不请求数据,进入页面请求数据
+       }
     },
     {
       path: '/mycard',

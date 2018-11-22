@@ -49,7 +49,7 @@ export default {
             } 
          this.$toast.loading({forbidClick: true});
             this.$axios({
-                url:"/api/userlogin",
+                url:"/api/user/userlogin",
                 method:"POST",
                 data:this.logininfo
             }).then((res)=>{
@@ -70,7 +70,7 @@ export default {
     },
     mounted:function(){
          this.$axios({
-                url:"/api/loginout",
+                url:"/api/user/loginout",
                 method:"POST"
             })
     }

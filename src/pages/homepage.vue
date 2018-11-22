@@ -59,13 +59,12 @@ export default {
                 this.$router.push="/login";
             }
           this.$axios({
-              url:"/api/getuseinfo",
+              url:"/api/user/getuseinfo",
               method:"POST",
               data:{
                   username:user
               }
           }).then((res)=>{
-              console.log(res);
               if(res.data.code==100){
                   this.userinfo=res.data.userinfo;
               }else{
@@ -78,6 +77,17 @@ export default {
   },
   mounted:function(){
         this.getuserinfo();
+  },
+  beforeRouteEnter:function(to,from,next){//如果修改资料成功后,进入该页面重新请求
+      if(to.query.change){
+        next(vm=>{//通过vm访问this
+                vm.getuserinfo();
+            }
+        );
+      }else{
+        next();
+      }
+      
   }
 };
 </script>
