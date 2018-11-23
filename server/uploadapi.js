@@ -8,11 +8,12 @@ var mysql = require('mysql');
 var $sql = require('./sqlfun');//sql语句
 
 //上传文件 根目录
-var fillpath = path.join(__dirname, 'uploadfile/');
-//用户头像目录
-var headimgpath = path.join(__dirname, 'uploadfile/headimg/');
-//用户文章图片上传目录
-var articleimg= path.join(__dirname, 'uploadfile/articleimg/');
+var filepathdir = path.join(__dirname, 'uploadfile/');
+var linkpath="/uploadfile/";
+//头像存放文件
+var userimgpath="headimg/";
+var articlepath="articleimg/";
+var videopath="videos/";
 
 
 //创建连接池
@@ -31,12 +32,13 @@ var handleerror=function(err,res){
 
 
 
-
+//上传头像
 router.post("/", (req, res) => {
     //获取上传图片数据
     var params = req.body;
     var image = params.image;
     var base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+    var filetype=image.split("/")[1].split(";")[0];//文件类型
     var dataBuffer = new Buffer(base64Data, 'base64');
     if (req.session.loginstate == null || req.session.loginstate == undefined) {
         res.json({
@@ -45,19 +47,20 @@ router.post("/", (req, res) => {
         })
         return;
     }
-    //文件命名
-    var randnum = Date.parse(new Date);//用户手机+时间戳+hd.jpg
-    var fillname = req.session.loginstate.user + randnum + "hd.jpg";
-    fs.writeFile(headimgpath + fillname, dataBuffer, function (err) {
+    var user=req.session.loginstate.user;
+    var fillname = "headimg."+filetype;
+    var savepath=filepathdir+userimgpath+fillname;
+    var returnpath=linkpath+userimgpath+fillname;
+    fs.writeFile(savepath, dataBuffer, function (err) {
         if (err) {
             res.json({
                 code: 0,
-                data: "上传图片失败"
+                data: err
             })
         } else {
             res.json({
                 code: 100,
-                data: "/uploadfile/headimg/" + fillname
+                data: returnpath
             })
         }
     })
@@ -66,7 +69,7 @@ router.post("/", (req, res) => {
 //文章图片上传接口,
 router.post("/articleimg", (req, res) => {
     var params = req.body;
-    var filename="article";
+    var addimgsql=$sql.user.addartimgs;
     //判读服务器登录状态
     if (req.session.loginstate == null || req.session.loginstate == undefined) {
         res.json({
@@ -75,28 +78,66 @@ router.post("/articleimg", (req, res) => {
         })
         return;
     }
-    if(params.length>=2){//多张上传
-
-        
-       
-
+    var user=req.session.loginstate.user;
+    if(params.length>=2){//多张上传 遇到问题:图片能正常上传, 上传数据库是多张相同的图片
+        var uploadimggroup=[];
+        var uploadimgerror={}; 
+        for(let i=0;i<params.length;i++){
+            var filetype=params[i].content.split("/")[1].split(";")[0];//文件类型
+            var base64Data = params[i].content.replace(/^data:image\/\w+;base64,/, "");//文件转为base64
+            var dataBuffer = new Buffer(base64Data, 'base64');//文件转为buffer
+            var filename=new Date().getTime().toString()+i+"."+filetype;//文件名称
+            var savepath=filepathdir+articlepath+filename;//文件存储路径
+            var imagepath=linkpath+articlepath+filename;  //文件访问路径
+            fs.writeFile(savepath, dataBuffer, function (err) {
+                if (err) {
+                    res.json({
+                        code: 0,
+                        data: err
+                    })
+                } else {
+                    var nowdate=new Date();        
+                    pool.getConnection(function(err,conn){
+                        err?handleerror(err,res):
+                        conn.query(addimgsql,[user,imagepath,nowdate], function(err, result) {
+                            if(err){
+                                uploadimgerror.error=true;
+                                uploadimgerror.errorindex+=i+",";
+                            }else{
+                                uploadimggroup.push(imagepath)
+                            }
+                            conn.release();
+                        })
+                    })
+                }
+            })
+        }
+        if(uploadimgerror.error){//若上传错误
+            res.json({
+                code:0,
+                data:"上传错误:"+uploadimgerror.errorindex
+            })
+        }else{//若无错误返回上传的图片路径数组
+            res.json({
+                code:100,
+                data:uploadimggroup
+            })
+        }
     } else {//单张上传
         var filetype=params.content.split("/")[1].split(";")[0];//文件类型
         var base64Data = params.content.replace(/^data:image\/\w+;base64,/, "");
         var dataBuffer = new Buffer(base64Data, 'base64');
-        filename+=new Date().getTime();
-        filename+="."+filetype;
-        fs.writeFile(articleimg + filename, dataBuffer, function (err) {
+        var filename=new Date().getTime()+"."+filetype;//文件名称
+        var savepath=filepathdir+articlepath+filename;//文件存储路径
+        var imagepath=linkpath+articlepath+filename;  //文件访问路径
+        fs.writeFile(savepath,dataBuffer, function (err) {
             if (err) {
                 res.json({
                     code: 0,
                     data: "上传图片失败"
                 })
             } else {
-                var addimgsql=$sql.user.addartimgs;
-                var nowdate=new Date();
-                var user=req.session.loginstate.user;
-                var imagepath="/uploadfile/articleimg/"+filename;            
+                var nowdate=new Date();    
                 pool.getConnection(function(err,conn){
                     err?handleerror(err,res):
                     conn.query(addimgsql,[user,imagepath,nowdate], function(err, result) {
@@ -141,6 +182,61 @@ router.post("/getimagegroup",function(req,res){
         conn.release()
     })
 })
+
+//上传视频
+router.post("/video",function(req,res){
+    var params = req.body;
+    var addimgsql=$sql.user.addartimgs;
+    //判读服务器登录状态
+    if (req.session.loginstate == null || req.session.loginstate == undefined) {
+        res.json({
+            code: 50,
+            data: "登录失效"
+        })
+        return;
+    }
+    var user=req.session.loginstate.user;
+    var filetype=params.content.split("/")[1].split(";")[0];//文件类型
+    var base64Data = params.content.replace(/^data:video\/\w+;base64,/, "");
+    var dataBuffer = new Buffer(base64Data, 'base64');
+    var filename=new Date().getTime()+"."+filetype;//文件名称
+    var savepath=filepathdir+videopath+filename;//文件存储路径
+    var imagepath=linkpath+videopath+filename;  //文件访问路径
+    fs.writeFile(savepath,dataBuffer, function (err) {
+        if (err) {
+            res.json({
+                code: 0,
+                data: "上传视频失败"
+            })
+        } else {
+            res.json({
+                code: 100,
+                data: "上传成功"
+            })
+
+
+            // var nowdate=new Date();    
+            // pool.getConnection(function(err,conn){
+            //     err?handleerror(err,res):
+            //     conn.query(addimgsql,[user,imagepath,nowdate], function(err, result) {
+            //         if(err){
+            //             res.json({
+            //                 code:0,
+            //                 data:err
+            //             })
+            //         }else{
+            //             res.json({
+            //                 code:100,
+            //                 data:imagepath
+            //             })
+            //         }
+            //         conn.release();
+            //     })
+            // })
+        }
+    })
+})
+
 
 
 

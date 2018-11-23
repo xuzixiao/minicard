@@ -10,7 +10,7 @@
                 <van-icon name='photo'/>
                 <span>图片</span>
             </div>
-            <div class="module">
+            <div class="module" @click="handvideo">
                 <van-icon name='play'/>
                 <span>视频</span>
             </div>
@@ -32,6 +32,10 @@ export default {
        },
        handphoto:function(){
         this.$store.commit('showphoto');
+        this.$emit('addmoduleindex',this.index);
+       },
+       handvideo:function(){
+        this.$store.commit('showvideo');
         this.$emit('addmoduleindex',this.index);
        }
    }

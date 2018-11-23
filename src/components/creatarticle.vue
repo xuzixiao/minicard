@@ -5,14 +5,28 @@
             <p>支持图文视频</p>
         </div>
     <addmodule :index="0" @addmoduleindex='addmoduleindex' ></addmodule>
+<!-- 渲染 -->
     <div v-for="item,index in articlecon" :key='index' class="section">
-        <div ><van-icon name="close" /></div>
-        <div class="section-text" v-if="item.type=='text'" @click="updateart(index)">
-            <randtext>{{item.data}}</randtext>
+        <!-- 文字渲染 -->
+        <div class="renderline" v-if="item.type=='text'">
+            <div class="line-handle">
+                <div class="line-edit"  @click="updateart(index)"><van-icon name="edit" /></div>
+                <div class="line-del" @click="del(index)"><van-icon name="close" /></div>
+            </div>
+            <div class="section-text">
+                <randtext>{{item.data}}</randtext>
+            </div>
         </div>
-        <div class="section-img"  v-if="item.type=='img'" @click="updateart(index)">
-            <randimg>{{item.data}}</randimg>
+        <!-- 图片渲染 -->
+        <div class="renderline" v-if="item.type=='img'">
+            <div class="section-img"  v-for="imggroup,imgindex in item.data" :key="imgindex">
+                <div class="line-img">
+                    <div class="line-del"  @click="del(index+','+imgindex)"><van-icon name="close" /></div>
+                    <img :src=imggroup />
+                </div>
+            </div> 
         </div>
+
         <div class="section-video" v-if="item.type=='video'" @click="updateart(index)">
             <randvideo>{{item.data}}</randvideo>
         </div>
@@ -23,6 +37,7 @@
         <div class="edittext">
             <div class="edittit">
                 <span @click="$store.commit('hidetextedit'),textinfo=''">取消</span>
+                <span>编辑文字</span>
                 <span @click="edittext">确认</span>
             </div>
             <div class="editmain">
@@ -34,34 +49,48 @@
     <van-popup v-model="$store.state.photoedit" position="left" class="edittext">
         <div class="edittext">
             <div class="edittit">
-                <span @click="$store.commit('hidephoto')">取消</span>
+                <span @click="cloeditimg">取消</span>
+                <span>选择图片</span>
                 <span @click="editimg">确认</span>
             </div>
             <div class="editmain">
                 <div class="imggroup">
-                    
                     <div class="img-single" v-for="item,index in imagesgroup" @click="toggle(index)">
                         <img :src="item.image">
                         <van-checkbox shape="square" v-model="item.checked" class="img-check" ref="imgcheckbox" />
                     </div>
-
                     <div class="img-single">                        
-                        <van-uploader :after-read="uploadimg" accept="image/gif, image/jpeg" multiple class="uploadbtn">
+                        <van-uploader :after-read="uploadimg" accept="image/gif, image/jpeg" class="uploadbtn">  <!-- multiple 加入后可多张上传,接口问题暂停使用 -->
                             <van-icon name="add-o" class="addicon" />
                         </van-uploader>
                     </div>
-                   
-
                 </div>
             </div>
         </div>
     </van-popup>
-
-
-
-
-
-
+<!-- 上传视频-->
+    <van-popup v-model="$store.state.videoedit" position="left" class="edittext">
+        <div class="edittext">
+            <div class="edittit">
+                <span @click="cloeditvideo">取消</span>
+                <span>选择视频</span>
+                <span @click="editvideo">确认</span>
+            </div>
+            <div class="editmain">
+                <div class="imggroup">
+                    <!-- <div class="img-single" v-for="item,index in imagesgroup" @click="toggle(index)">
+                        <img :src="item.image">
+                        <van-checkbox shape="square" v-model="item.checked" class="img-check" ref="imgcheckbox" />
+                    </div> -->
+                    <div class="img-single">                        
+                        <van-uploader :after-read="uploadvideo" accept="video/*" class="uploadbtn">  <!-- multiple 加入后可多条上传,接口问题暂停使用 -->
+                            <van-icon name="add-o" class="addicon" />
+                        </van-uploader>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </van-popup>
     </div>
 </template>
 
@@ -81,7 +110,7 @@ export default {
                 index:0
             },
             articlecon:[],
-            imagesgroup:[]
+            imagesgroup:[]//图片存放处
         }
     },
     computed:{
@@ -145,7 +174,16 @@ export default {
                     newimgarr.push(imagesgroup[i].image);
                 }
             }
-            console.log(newimgarr);
+            let nowindex=this.artaddnowindex;
+            let imagegroup={
+                    type:"img",
+                    data:newimgarr
+                }
+
+
+            this.articlecon.splice(nowindex,0,imagegroup);
+            this.imagesgroup.forEach((e)=>e.checked=false);
+            console.log(this.articlecon);
         },
         //获取添加位置
         addmoduleindex:function(addmoduleindex){
@@ -153,13 +191,13 @@ export default {
         },
         //上传图片
         uploadimg:function(e){
-            console.log(e);
             this.$axios({
                 url:"/api/upload/articleimg",
                 method:"POST",
                 data:e
             }).then((res)=>{
                     if(res.data.code==100){
+                        console.log(res.data.data);
                         this.imagesgroup.push({image:res.data.data,checked:false});
                         console.log(this.imagesgroup);
                     }else{
@@ -200,10 +238,58 @@ export default {
                 console.log(res);
             })
         },
+        //图片多选
         toggle:function(index){
             console.log(index);
             this.$refs.imgcheckbox[index].toggle();
             //imgcheckbox
+        },
+        //关闭图片弹窗
+        cloeditimg:function(){
+            this.$store.commit('hidephoto');
+            this.imagesgroup.forEach((e)=>e.checked=false);
+        },
+        del:function(index){//删除
+            if(typeof(index)=="number"){//如果传过来一个值
+                this.articlecon.splice(index,1);                
+            }else{
+                let index1=index.split(",")[0];
+                let index2=index.split(",")[1];
+                this.articlecon[index1].data.splice(index2,1);
+                if(this.articlecon[index1].data.length==0){
+                    this.articlecon.splice(index1,1);
+                }
+            }
+        },
+        //视频
+        cloeditvideo:function(){//关闭视频上传弹窗
+            this.$store.commit("hidevideo");
+        },
+        editvideo:function(){ //选择视频后按钮
+            this.$store.commit("hidevideo");
+        },
+        uploadvideo:function(e){
+            this.$axios({
+                url:"/api/upload/video",
+                method:"POST",
+                data:e
+            }).then((res)=>{
+                    if(res.data.code==100){
+                        
+                    }else{
+                        this.$toast(res.data.data);
+                        if(res.data.code==50){
+                            var vm=this;
+                            setTimeout(()=>{
+                                vm.$router.push("/login");
+                            },800)
+                        }
+                    }
+                },
+                (res)=>{
+                    console.log(res);
+                }
+            )
         }
     },
     created:function(){
@@ -390,5 +476,39 @@ export default {
 .uploadbtn{
     width: 100%;
     height: 100%;
+}
+.section-img img{
+    width: 100%;
+}
+.renderline{
+ margin: 0px;
+ padding: 5px;
+ border: #999 dashed 1px;
+ border-radius: 10px;
+ position: relative;
+}
+.line-handle{
+    display: flex;
+    justify-content:flex-end;
+}
+.line-handle i{
+    font-size: 20px;
+    margin-left: 10px;
+    color: #999;
+}
+.line-img{
+    position: relative;
+}
+.line-img .line-del{
+    font-size: 20px;
+    color: #999;
+    width: 20px;
+    line-height: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    right:5px;
+    top:5px;
 }
 </style>
