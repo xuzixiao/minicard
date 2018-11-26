@@ -186,7 +186,7 @@ router.post("/getimagegroup",function(req,res){
 //上传视频
 router.post("/video",function(req,res){
     var params = req.body;
-    var addimgsql=$sql.user.addartimgs;
+    var addvideosql=$sql.user.addvideosql;
     //判读服务器登录状态
     if (req.session.loginstate == null || req.session.loginstate == undefined) {
         res.json({
@@ -209,33 +209,51 @@ router.post("/video",function(req,res){
                 data: "上传视频失败"
             })
         } else {
-            res.json({
-                code: 100,
-                data: "上传成功"
+            var nowdate=new Date();
+            pool.getConnection(function(err,conn){
+                err?handleerror(err,res):
+                conn.query(addvideosql,[user,imagepath,nowdate], function(err, result) {
+                    if(err){
+                        res.json({
+                            code: 0,
+                            data:err,
+                        })
+                    }else{
+                        res.json({
+                            code:100,
+                            data:imagepath
+                        })
+                    }
+                })
             })
-
-
-            // var nowdate=new Date();    
-            // pool.getConnection(function(err,conn){
-            //     err?handleerror(err,res):
-            //     conn.query(addimgsql,[user,imagepath,nowdate], function(err, result) {
-            //         if(err){
-            //             res.json({
-            //                 code:0,
-            //                 data:err
-            //             })
-            //         }else{
-            //             res.json({
-            //                 code:100,
-            //                 data:imagepath
-            //             })
-            //         }
-            //         conn.release();
-            //     })
-            // })
         }
     })
 })
+
+
+//获取用户的视频
+router.post("/getvideogroup",function(req,res){
+    var getvideosql=$sql.user.getvideosql;
+    var user=req.body.user;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(getvideosql,user, function(err, result) {
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                res.json({
+                    code:100,
+                    data:result
+                })
+            }
+        })
+        conn.release()
+    })
+})
+
 
 
 

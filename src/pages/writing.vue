@@ -12,27 +12,30 @@
             <div class="uploadbgimg">
                 <div class="text"><van-icon name="photo" class="texticon" />上传封面图片</div>
                 <img :src="artbanner"  v-if="hasbannerimg" class="uploadimg" />
-                <van-uploader :after-read="uploadheadimg"  class="choosefile"></van-uploader>
+                <van-uploader :after-read="uploadheadimg" accept="image/gif, image/jpeg"  class="choosefile"></van-uploader>
+                <span class="closeimg" v-if="hasbannerimg" @click="delfmimg">
+                    <van-icon name="close" />
+                </span>
             </div>
 
             <div class="line">
                 <div class="line-label"><span>文章类别</span></div>
                 <div class="line-main">
-                    <van-field  :value="categoryname" placeholder="请选择文章类别" readonly  class="input" @click="chooseartfl=true" />
+                    <van-field :value="categoryname" placeholder="请选择文章类别" readonly  class="input" @click="chooseartfl=true" />
                 </div>
             </div>
 
             <div class="line">
                 <div class="line-label"><span>文章标题</span></div>
                 <div class="line-main">
-                    <van-field  value="" type="textarea" autosize class="input" />
+                    <van-field v-model="articletit" type="textarea" autosize class="input" />
                 </div>
             </div>
 
             <div class="line tuijian">
                 <div class="line-label"><span>是否设为推荐</span></div>
                 <div class="line-main">
-                    <van-switch v-model="checked"  size="20px"/>
+                    <van-switch v-model="tuijian"  size="20px"/>
                 </div>
             </div>
             
@@ -40,11 +43,11 @@
                 <div class="line-label"><span>文章内容</span></div>
                 <div class="line-main articlemain">
                   
-                  <Created-Aritle></Created-Aritle>
+                  <Created-Aritle ref="article"></Created-Aritle>
 
                 </div>
             </div>
-            <van-button size="large" class="savecard">保存文章</van-button>
+            <van-button size="large" class="savecard" @click="saveart">保存文章</van-button>
         </div>
 
 
@@ -60,15 +63,15 @@
 </template>
 <script>
 import CreatedAritle from '@/components/creatarticle'
+import { stringify } from 'querystring';
 export default {
     data(){
         return{
             artbanner:"",
             articletit:"",
-            checked:false,
+            tuijian:false,
             chooseartfl:false,
             categoryid:"",
-            //categoryname:"",
             category:"",//文章分类
         }
     },
@@ -93,7 +96,27 @@ export default {
     },
     methods:{
         uploadheadimg:function(e){
-          
+            this.$axios({
+                url:"/api/upload/articleimg",
+                method:"POST",
+                data:e
+            }).then(
+                (res)=>{
+                    if(res.data.code==100){
+                        this.artbanner=res.data.data
+                    }else{
+                        if(res.data.code==50){
+                            var vm=this;
+                            setTimeout(()=>{
+                                vm.$router.push("/login");
+                            },800)
+                        }
+                    }
+                },
+                (res)=>{
+                    console.log(res);        
+                }
+            )
         },
         getcategory:function(){
             var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
@@ -124,9 +147,58 @@ export default {
                 console.log("====获取文章分类失败====");
             })
         },
+        delfmimg:function(){
+            this.artbanner="";
+        },
         findthisfl:function(categoryid){
             this.categoryid=categoryid;
             this.chooseartfl=false;
+        },
+        saveart:function(){
+            var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            if(user==null){
+                this.$router.push="/login";
+            }
+            let bannerimg=this.artbanner;//文章头图
+            let categoryid=this.categoryid;//文章分类
+            let arttitle=this.articletit;//文章标题
+            let tuijian=this.tuijian;//文章推荐
+            let artcon=this.$refs.article.articlecon//文章内容
+            if(categoryid==""){
+                this.$toast("请选择文章所属分类");
+                return;
+            }
+            if(arttitle==""){
+                 this.$toast("文章标题不能为空");
+                 return;
+            }
+            if(artcon.length==0){
+                 this.$toast("您的文章内容不能为空");
+                 return;
+            }
+            //文章内容为string
+            artcon=JSON.stringify(artcon);
+            this.$axios({
+                url:"/api/article/savearticle",
+                method:"POST",
+                data:{
+                    user:user,
+                    artbanner:bannerimg,
+                    artcategoryid:categoryid,
+                    arttitle:arttitle,
+                    tuijian:tuijian,
+                    artcon:artcon
+                }
+            }).then(
+                (res)=>{
+                    if(res.data.code==100){
+                        this.$toast("保存成功");
+                    }
+                },
+                (res)=>{
+                    console.log(res);
+                }
+            )
         }
     },
     created:function(){
@@ -268,5 +340,27 @@ flex-wrap: wrap;
     border: #ebebeb dashed 1px;
     padding:10px 10px 30px;
     border-radius: 5px;
+}
+.closeimg{
+    width: 25px;
+    height: 25px;
+    position:absolute;
+    top: 10px;
+    right: 10px;
+    background: #fff;
+    border-radius: 50%;
+    z-index: 500;
+    box-shadow: 0 0 5px rgba(0, 0, 0,.1);
+    cursor: pointer;
+    text-align: center;
+}
+.closeimg i{
+    display: block;
+    width: 25px;
+    height: 25px;
+    font-size: 20px;
+    color: #666;
+    text-align: center;
+    line-height: 25px;
 }
 </style>

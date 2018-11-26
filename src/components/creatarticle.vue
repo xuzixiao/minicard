@@ -27,9 +27,16 @@
             </div> 
         </div>
 
-        <div class="section-video" v-if="item.type=='video'" @click="updateart(index)">
-            <randvideo>{{item.data}}</randvideo>
+         <!-- 视频渲染 -->
+        <div class="renderline" v-if="item.type=='video'">
+            <div class="section-img"  v-for="videogroup,videoindex in item.data" :key="videoindex">
+                <div class="line-img">
+                    <div class="line-del" @click="del(index+','+videoindex)"><van-icon name="close" /></div>
+                    <video :src="videogroup" controls="controls" class="video"></video>
+                </div>
+            </div> 
         </div>
+
         <addmodule :index='index+1' @addmoduleindex='addmoduleindex'></addmodule>
     </div>
 <!-- 添加文字段落窗口-->
@@ -60,7 +67,7 @@
                         <van-checkbox shape="square" v-model="item.checked" class="img-check" ref="imgcheckbox" />
                     </div>
                     <div class="img-single">                        
-                        <van-uploader :after-read="uploadimg" accept="image/gif, image/jpeg" class="uploadbtn">  <!-- multiple 加入后可多张上传,接口问题暂停使用 -->
+                        <van-uploader :after-read="uploadimg" :oversize="outsize" accept="image/gif, image/jpeg" class="uploadbtn">  <!-- multiple 加入后可多张上传,接口问题暂停使用 -->
                             <van-icon name="add-o" class="addicon" />
                         </van-uploader>
                     </div>
@@ -78,13 +85,15 @@
             </div>
             <div class="editmain">
                 <div class="imggroup">
-                    <!-- <div class="img-single" v-for="item,index in imagesgroup" @click="toggle(index)">
-                        <img :src="item.image">
-                        <van-checkbox shape="square" v-model="item.checked" class="img-check" ref="imgcheckbox" />
-                    </div> -->
-                    <div class="img-single">                        
-                        <van-uploader :after-read="uploadvideo" accept="video/*" class="uploadbtn">  <!-- multiple 加入后可多条上传,接口问题暂停使用 -->
+                    <div class="img-single videolist" v-for="item,index in videosgroup" @click="togglevideo(index)">
+                        <video :src="item.video"></video>
+                        <van-checkbox shape="square" v-model="item.checked" class="img-check" ref="videocheckbox" />
+                    </div>
+                    <div class="img-single addvideo">                        
+                        <van-uploader :after-read="uploadvideo" accept="video/*" class="uploadbtn" :max-size=videomaxsize :oversize="outsize" >  <!-- multiple 加入后可多条上传,接口问题暂停使用 -->
+                            <!-- 视频控制在30mb之内 -->
                             <van-icon name="add-o" class="addicon" />
+                            <span class="maxsizetip">30M内的视频</span>
                         </van-uploader>
                     </div>
                 </div>
@@ -102,6 +111,7 @@ import addmodule from "@/components/randarticle/addmodule";
 export default {
     data(){
         return{
+            videomaxsize:31457280,
             checkstate:true,
             artaddnowindex:"",//段落添加当前位置
             textinfo:"",
@@ -110,7 +120,8 @@ export default {
                 index:0
             },
             articlecon:[],
-            imagesgroup:[]//图片存放处
+            imagesgroup:[],//图片存放处
+            videosgroup:[]//视频存放处
         }
     },
     computed:{
@@ -179,11 +190,8 @@ export default {
                     type:"img",
                     data:newimgarr
                 }
-
-
             this.articlecon.splice(nowindex,0,imagegroup);
             this.imagesgroup.forEach((e)=>e.checked=false);
-            console.log(this.articlecon);
         },
         //获取添加位置
         addmoduleindex:function(addmoduleindex){
@@ -197,9 +205,7 @@ export default {
                 data:e
             }).then((res)=>{
                     if(res.data.code==100){
-                        console.log(res.data.data);
                         this.imagesgroup.push({image:res.data.data,checked:false});
-                        console.log(this.imagesgroup);
                     }else{
                         this.$toast(res.data.data);
                         if(res.data.code==50){
@@ -240,9 +246,11 @@ export default {
         },
         //图片多选
         toggle:function(index){
-            console.log(index);
             this.$refs.imgcheckbox[index].toggle();
-            //imgcheckbox
+        },
+        //视频多选
+        togglevideo:function(index){
+            this.$refs.videocheckbox[index].toggle();
         },
         //关闭图片弹窗
         cloeditimg:function(){
@@ -262,20 +270,43 @@ export default {
             }
         },
         //视频
+        outsize:function(e){
+            console.log("视频大小已经达到上限");
+            this.$toast("视频大小已经达到上限");
+        },
         cloeditvideo:function(){//关闭视频上传弹窗
             this.$store.commit("hidevideo");
         },
         editvideo:function(){ //选择视频后按钮
             this.$store.commit("hidevideo");
+            //筛选出选中的视频
+            var newvideo=[];
+            var videosgroup=this.videosgroup;
+            for(let i=0;i<videosgroup.length;i++){
+                if(videosgroup[i].checked){
+                    newvideo.push(videosgroup[i].video);
+                }
+            }
+            let nowindex=this.artaddnowindex;
+            let videogroup={
+                    type:"video",
+                    data:newvideo
+                }
+            this.articlecon.splice(nowindex,0,videogroup);
+            this.videosgroup.forEach((e)=>e.checked=false);
         },
         uploadvideo:function(e){
+            const loadupload=this.$toast.loading({
+                mask: true,
+                message: '视频上传中'
+            });
             this.$axios({
                 url:"/api/upload/video",
                 method:"POST",
                 data:e
             }).then((res)=>{
                     if(res.data.code==100){
-                        
+                        this.videosgroup.push({video:res.data.data,checked:false});
                     }else{
                         this.$toast(res.data.data);
                         if(res.data.code==50){
@@ -287,6 +318,37 @@ export default {
                     }
                 },
                 (res)=>{
+                    loadupload.clear();
+                    console.log(res);
+                }
+            )
+        },
+        //获取用户所有视频
+        getvideogroup:function(){
+            var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            if(user==null){
+                this.$router.push="/login";
+            }
+            this.$axios({
+                url:"/api/upload/getvideogroup",
+                method:"POST",
+                data:{
+                    user:user
+                }
+            }).then(
+                (res)=>{
+                    if(res.data.code==100){
+                        //this.videosgroup=res.data.data
+                    var videolist=[];
+                    for(let i=0;i<res.data.data.length;i++){
+                       res.data.data[i].checked=false;
+                       videolist.push(res.data.data[i])     
+                    }
+                    this.videosgroup=videolist;
+                    }else{
+                        console.log(res.data);
+                    }
+                },(res)=>{
                     console.log(res);
                 }
             )
@@ -294,6 +356,7 @@ export default {
     },
     created:function(){
        this.getimage();
+       this.getvideogroup();
     }
 }
 </script>
@@ -372,7 +435,7 @@ export default {
     display: block;
     width: 30px;
     height: 30px;
-    margin: 0 auto;
+    margin:10px auto 0px;
     position: relative;
     z-index: 1000;
 }
@@ -510,5 +573,27 @@ export default {
     position: absolute;
     right:5px;
     top:5px;
+    z-index: 1000;
+}
+.maxsizetip{
+    display: block;
+    font-size: 12px;
+    position: absolute;
+    bottom:0px;
+    line-height: 20px;
+    width: 100%;
+    text-align: center;
+    color: #999;
+}
+.addvideo .addicon{
+    line-height: 80px;
+}
+.videolist video{
+    width: 100%;
+    height: 100px;
+}
+video.video{
+    width: 100%;
+    height:auto;
 }
 </style>

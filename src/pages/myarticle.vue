@@ -21,7 +21,7 @@
     <div v-cloak class="art-list"  v-if="havecategory">
         <van-row gutter='10'>
             <van-col span="8" v-for="(item,index) in category" :key="index">
-                <div class="navlist" @click="choosecategory(item.id)">
+                <div class="navlist" @click="choosecategory(item.id,item.categoryname)">
                     <van-icon name="tosend" />
                     <p>{{item.categoryname}}</p>
                 </div>
@@ -131,11 +131,12 @@ export default {
                 }
             )
         },
-        choosecategory:function(id){//选择此分类
+        choosecategory:function(id,categoryname){//选择此分类
             this.$router.push({
-                path:"/writing",
+                path:"/artcategory",
                 query:{
-                    categoryid:id
+                    categoryid:id,
+                    categoryname:categoryname
                 }
             })
         }

@@ -10,7 +10,12 @@ var sqlMap = {
         setcategory:'INSERT INTO category(categoryname,userid,createtime) Value(?,?,?)',//添加用户文章分类
         querycatename:'SELECT * FROM category WHERE userid = ? and categoryname = ?',//查询用户有没有此文章分类
         addartimgs:'Insert into articleimg(user,image,createtime) value(?,?,?)',//保存文章图片
-        getimagesql:'SELECT image FROM articleimg WHERE user = ?'            
+        getimagesql:'SELECT image FROM articleimg WHERE user = ?',//获取用户图片
+        addvideosql:'Insert into uservideo(user,video,createtime) value(?,?,?)',//保存文章视频
+        getvideosql:'SELECT video FROM uservideo WHERE user = ?'  //获取用户上传的所有视频          
+    },
+    article:{
+        save:"Insert into article(user,artbanner,artcategoryid,arttitle,tuijian,artcon,createtime) value(?,?,?,?,?,?,?)"
     }
 }
 module.exports = sqlMap;

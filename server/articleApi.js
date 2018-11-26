@@ -87,7 +87,35 @@ router.post('/setcategory',(req,res) =>{
     })
 })
 
-//写文章
+//保存文章
+router.post("/savearticle",function(req,res){
+    var saveartsql=$sql.article.save;
+    var user=req.body.user;
+    var artbanner=req.body.artbanner;
+    var artcategoryid=req.body.artcategoryid;
+    var arttitle=req.body.arttitle;
+    var tuijian=req.body.tuijian;
+    var artcon=req.body.artcon;
+    var createtime=new Date();
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(saveartsql,[user,artbanner,artcategoryid,arttitle,tuijian,artcon,createtime],function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                res.json({
+                    code:100,
+                    data:"保存成功"
+                })
+
+            }
+        })
+    })
+
+})
 
 
 

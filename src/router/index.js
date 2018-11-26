@@ -35,6 +35,9 @@ import page from '@/pages/page'
 import adminlogin from '@/admin/login'
 //管理中心主页
 import adminmain from '@/admin/main'
+//文章分类
+import artcategory from '@/pages/artcategory'
+
 
 Vue.use(Router)
 
@@ -138,7 +141,12 @@ const router = new Router({
       name: 'page',
       component: page,
       meta: { requireAuth: true }
-    }, {
+    },{
+      path: '/artcategory',
+      name: 'artcategory',
+      component: artcategory,
+      meta: { requireAuth: true }
+    },{
       path: "/admin",
       name: "admin",
       component: adminmain,
