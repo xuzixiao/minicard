@@ -9,32 +9,32 @@
 <div class="art-mian">
   <van-row class="art-main-title">
     <van-col span="8">
-        <p><van-icon name="idcard" />文章列表</p>
+        <p><van-icon name="idcard"/>文章列表</p>
     </van-col>
     <van-col span="16" style="text-align:right">
-       <router-link to="/writing"><van-button  size="small">写文章</van-button></router-link>
+       <van-button  size="small" @click="writeart">写文章</van-button>
     </van-col>
   </van-row>
 
-    <div v-cloak class="art-list">
-        <div class="art">
+    <div v-cloak class="art-list" v-if="haveart" v-cloak>
+        <div v-for="item,index in artlist" :key="index">
+            <router-link :to="{path:'/article',query:{article:item.Id}}" class="art">
             <div class="art-img">
-                <img src="/uploadfile/articleimg/1543218788743.jpeg" />
+                <img :src="item.artbanner" />
             </div>
             <div class="art-info">
-                <p class="tit">文章标题文章标题文章标题文章标题</p>
-                <p class="date"><span>2018-11-26</span></p>
+                <p class="tit">{{item.arttitle}}</p>
+                <p class="date"><span>{{item.createtime.split(" ")[0]}}</span></p>
             </div>
+            </router-link>
         </div>
-
-
-
     </div>
 
-    <div v-cloak class="art-none">
+    <div v-cloak class="art-none" v-if="!haveart" v-cloak>
         <van-icon name="info-o"/>
         <p>暂无文章</p>
     </div>
+
 </div>
 
 </div>
@@ -43,18 +43,67 @@
 export default {
     data(){
         return{
-            pagetitle:""
+            pagetitle:"",
+            categoryid:"",
+            artlist:[]
+        }
+    },
+    computed:{
+        haveart:function(){
+            if(this.artlist.length==0){
+                return false
+            }else{
+                return true
+            }
         }
     },
     created:function(){
         this.pagetitle=this.$route.query.categoryname;
         this.categoryid=this.$route.query.categoryid;
-
+        if(this.$route.query.categoryid){
+            this.getartlist(this.$route.query.categoryid);
+        }
+    },
+    methods:{
+        getartlist:function(categoryid){
+            var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            if(user==null){
+                this.$router.push="/login";
+            }
+            this.$axios({
+                url:"/api/article/getartlist",
+                method:"POST",
+                data:{
+                    user:user,
+                    categoryid:categoryid
+                }
+            }).then((res)=>{
+                if(res.data.code==100){
+                    if(res.data.data.length==0){
+                        this.artlist=[]
+                    }else{
+                        this.artlist=res.data.data;
+                    }
+                }else{
+                     this.$toast(res.data.data);
+                }
+            },(res)=>{
+                console.log("====获取文章列表失败====");
+            })
+        },
+        writeart:function(){
+            this.$router.push({
+                path:"/writing",
+                query:{
+                    categoryid:this.categoryid
+                }
+            })
+        }
     }    
 }
 </script>
 
-<style>
+<style scoped>
 [v-cloak]{
   display: none!important;
 }
@@ -154,7 +203,8 @@ export default {
     height: auto;
 }
 .art-info{
-    margin-left: 10px;
+    margin-left: 4%;
+    width: 66%;
 }
 .art-info p{
     font-size: 14px;

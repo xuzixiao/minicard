@@ -15,7 +15,9 @@ var sqlMap = {
         getvideosql:'SELECT video FROM uservideo WHERE user = ?'  //获取用户上传的所有视频          
     },
     article:{
-        save:"Insert into article(user,artbanner,artcategoryid,arttitle,tuijian,artcon,createtime) value(?,?,?,?,?,?,?)"
+        save:"Insert into article(user,artbanner,artcategoryid,arttitle,tuijian,artcon,createtime) value(?,?,?,?,?,?,?)",
+        getartlist:"SELECT * FROM article WHERE user = ? and artcategoryid = ?",
+        getarticle:"SELECT * FROM article WHERE Id = ?"
     }
 }
 module.exports = sqlMap;

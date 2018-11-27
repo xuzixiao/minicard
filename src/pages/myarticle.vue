@@ -56,7 +56,7 @@
 export default {
     data(){
         return{
-            pagetitle:"我的文章",
+            pagetitle:"文章中心",
             show:false,
             categoryname:"",//分类名称
             category:[],

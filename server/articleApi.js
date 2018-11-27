@@ -112,9 +112,70 @@ router.post("/savearticle",function(req,res){
                 })
 
             }
+            conn.release();
         })
     })
 
+})
+
+//获取文章列表
+router.post("/getartlist",function(req,res){
+    var getartlistsql=$sql.article.getartlist;
+    var categoryid=req.body.categoryid;
+    var user=req.body.user;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(getartlistsql,[user,categoryid],function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                res.json({
+                    code:100,
+                    data:result
+                })
+            }
+            conn.release();
+        })
+    })
+})
+
+//获取文章内容
+//返回指定文章内容以及文章作者信息
+router.post("/getarticle",function(req,res){
+    var sql=$sql.article.getarticle;
+    var Id=req.body.Id;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(sql,Id,function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+             var resdata=result[0];
+             var getuserinforsql=$sql.user.userinfo;
+             conn.query(getuserinforsql,resdata.user,function(err,result){
+                if(err){
+                    res.json({
+                        code:0,
+                        data:err
+                    })
+                }else{
+                    var data={article:resdata,userinfo:result[0]};
+                    res.json({
+                        code:100,
+                        data:data
+                    })
+                }
+             })
+            }
+            conn.release();
+        })
+    })
 })
 
 

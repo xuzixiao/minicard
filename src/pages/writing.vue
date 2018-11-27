@@ -64,6 +64,7 @@
 <script>
 import CreatedAritle from '@/components/creatarticle'
 import { stringify } from 'querystring';
+import { setTimeout } from 'timers';
 export default {
     data(){
         return{
@@ -192,7 +193,11 @@ export default {
             }).then(
                 (res)=>{
                     if(res.data.code==100){
-                        this.$toast("保存成功");
+                       this.$toast("保存成功");
+                       var that=this;
+                       setTimeout(function(){
+                        that.$router.go(-1);    
+                       },500)
                     }
                 },
                 (res)=>{
