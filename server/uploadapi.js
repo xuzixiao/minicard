@@ -11,7 +11,7 @@ var $sql = require('./sqlfun');//sql语句
 var filepathdir = path.join(__dirname, 'uploadfile/');
 var linkpath="/uploadfile/";
 //头像存放文件
-var userimgpath="headimg/";
+var userimgpath="userfile/";
 var articlepath="articleimg/";
 var videopath="videos/";
 
@@ -28,12 +28,15 @@ var handleerror=function(err,res){
     return;
 }
 
-
+router.get("/",(req,res)=>{
+    res.header("Content-Type", "application/json;charset=utf-8");  
+    res.end("上传接口");
+})
 
 
 
 //上传头像
-router.post("/", (req, res) => {
+router.post("/headimg", (req, res) => {
     //获取上传图片数据
     var params = req.body;
     var image = params.image;
@@ -48,7 +51,7 @@ router.post("/", (req, res) => {
         return;
     }
     var user=req.session.loginstate.user;
-    var fillname = "headimg."+filetype;
+    var fillname =user+"headimg."+filetype;
     var savepath=filepathdir+userimgpath+fillname;
     var returnpath=linkpath+userimgpath+fillname;
     fs.writeFile(savepath, dataBuffer, function (err) {
@@ -65,6 +68,46 @@ router.post("/", (req, res) => {
         }
     })
 })
+
+
+//上传微信二维码图片
+router.post("/ewm", (req, res) => {
+    //获取上传图片数据
+    var params = req.body;
+    var image = params.image;
+    var base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+    var filetype=image.split("/")[1].split(";")[0];//文件类型
+    var dataBuffer = new Buffer(base64Data, 'base64');
+    if (req.session.loginstate == null || req.session.loginstate == undefined) {
+        res.json({
+            code: 50,
+            data: "登录失效"
+        })
+        return;
+    }
+    var user=req.session.loginstate.user;
+    var fillname =user+"ewm."+filetype;
+    var savepath=filepathdir+userimgpath+fillname;
+    var returnpath=linkpath+userimgpath+fillname;
+    fs.writeFile(savepath, dataBuffer, function (err) {
+        if (err) {
+            res.json({
+                code: 0,
+                data: err
+            })
+        } else {
+            res.json({
+                code: 100,
+                data: returnpath
+            })
+        }
+    })
+})
+
+
+
+
+
 
 //文章图片上传接口,
 router.post("/articleimg", (req, res) => {

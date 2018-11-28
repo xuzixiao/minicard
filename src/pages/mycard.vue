@@ -4,7 +4,7 @@
         title="我的名片" 
         left-text="返回"
         left-arrow
-        @click-left="back"
+        @click-left="$router.go(-1)"
         />
 
         <div class="box">
@@ -21,11 +21,28 @@
                       </van-uploader>
                   </van-col>
             </van-row>
-
-            <van-cell-group>
+            
+             <van-cell-group>
                 <van-field v-model="userinfo.name" label="姓名" placeholder="请输入真实姓名" />
                 <van-field v-model="userinfo.mobile" disabled label="手机号" placeholder="请输入手机号" />
                 <van-field v-model="userinfo.wechat" label="微信号" placeholder="请输入微信号" />
+            </van-cell-group>
+
+            <van-row class="userheadimg">
+                  <van-col span="6">
+                      <p>微信二维码</p>
+                      </van-col>
+                  <van-col span="8">
+                      <img :src="userinfo.wxewmimg==null||userinfo.wxewmimg==''?'static/images/morenheadimg.png':userinfo.wxewmimg" />
+                  </van-col>
+                  <van-col span="8">
+                      <van-uploader :after-read="updatewxewm" accept="image/jpeg" multiple>
+                        <van-button size="small" class="updateimgbtn">修改二维码</van-button>
+                      </van-uploader>
+                  </van-col>
+            </van-row>
+
+            <van-cell-group>
                 <van-field v-model="userinfo.company" label="公司名称" placeholder="请输入所在公司名称" />
                 <van-field v-model="userinfo.branch" label="所属部门" placeholder="请输入所在公司部门" />
                 <van-field v-model="userinfo.office" label="职务" placeholder="请输入您的职务" />
@@ -45,9 +62,6 @@ export default {
         }
     },
     methods:{
-        back:function(){
-            this.$router.push("/home")
-        },
         getuserinfo:function(){
           var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
             if(user==null){
@@ -72,7 +86,7 @@ export default {
     //修改头像
     updateheadimg:function(e){   
       this.$axios({
-          url:"/api/upload",
+          url:"/api/upload/headimg",
           method:"POST",
           data:{
               image:e.content
@@ -95,6 +109,34 @@ export default {
           }
       )
     },
+    //修改微信二维码
+    updatewxewm:function(e){
+        
+        this.$axios({
+          url:"/api/upload/ewm",
+          method:"POST",
+          data:{
+              image:e.content
+          }
+      }).then(
+          (res)=>{
+             if(res.data.code==100){
+                 this.userinfo.wxewmimg=res.data.data
+             }else{
+                 this.$toast(res.data.data);
+                 if(res.data.code==50){
+                     var vm=this;
+                     setTimeout(()=>{
+                         vm.$router.push("/login");
+                     },800)
+                 }
+             }
+          },(res)=>{
+              console.log("====上传失败====");
+          }
+      )
+        
+    },
     seavecard:function(){
       this.$axios({
           url:"/api/user/savecardinfo",
@@ -103,6 +145,7 @@ export default {
               name:this.userinfo.name,
               headimg:this.userinfo.headimg,
               wechat:this.userinfo.wechat,
+              wxewmimg:this.userinfo.wxewmimg,
               company:this.userinfo.company,
               branch:this.userinfo.branch,
               office:this.userinfo.office,
@@ -152,7 +195,7 @@ export default {
 }
 .userheadimg{
     border-bottom: #eee solid 0px;
-    padding-bottom: 10px;
+    padding: 5px 0px;
 }
 .userheadimg img{
     display: block;

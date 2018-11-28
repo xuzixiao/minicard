@@ -18,7 +18,7 @@
 
     <div v-cloak class="art-list" v-if="haveart" v-cloak>
         <div v-for="item,index in artlist" :key="index">
-            <router-link :to="{path:'/article',query:{article:item.Id}}" class="art">
+            <router-link target="_blank" :to="{path:'/article',query:{article:item.Id}}" class="art">
             <div class="art-img">
                 <img :src="item.artbanner" />
             </div>
@@ -188,15 +188,17 @@ export default {
 }
 .art{
     width: 100%;
-    height: 80px;
+    height: 100px;
     border-bottom: #eee dashed 1px;
     display: flex;
+    padding: 10px 0px;
 }
 .art-img{
-    width: 30%;
+    width: 150px;
     height: 80px;
     display: flex;
     align-items: center;
+    overflow: hidden;
 }
 .art-img img{
     width: 100%;

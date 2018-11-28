@@ -166,7 +166,7 @@ router.post('/savecardinfo',(req,res) =>{
     var mobile=req.session.loginstate.user;
     pool.getConnection(function(err,conn){
         err?handleerror(err,res):
-        conn.query(sql,[params.name,params.headimg,params.wechat,params.company,params.branch,params.office,params.dictum,params.address,params.operate,mobile], function(err, result) {
+        conn.query(sql,[params.name,params.headimg,params.wechat,params.wxewmimg,params.company,params.branch,params.office,params.dictum,params.address,params.operate,mobile], function(err, result) {
                 if (err) {
                     res.json({
                         code:0,

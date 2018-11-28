@@ -54,7 +54,6 @@ export default {
                 data:this.logininfo
             }).then((res)=>{
                 this.$toast.clear();
-                console.log(this);
                 if(res.data.code==0){
                     this.$toast(res.data.msg)
                 }else if(res.data.code==100){
