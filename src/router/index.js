@@ -39,7 +39,8 @@ import adminmain from '@/admin/main'
 import artcategory from '@/pages/artcategory'
 //文章内容页
 import article from '@/pages/article'
-
+//文章列表
+import artlist from '@/pages/artlist'
 
 
 
@@ -124,10 +125,10 @@ const router = new Router({
       meta: { requireAuth: true }
     },
     {
-      path: '/createpage',
-      name: 'createpage',
+      path: '/page',
+      name: 'page',
       component: Createpage,
-      meta: { requireAuth: true }
+      meta: { requireAuth: false }
     },
     {
       path: '/choosepage',
@@ -140,12 +141,14 @@ const router = new Router({
       name: 'Writing',
       component: Writing,
       meta: { requireAuth: true }
-    }, {
-      path: '/page',
-      name: 'page',
-      component: page,
-      meta: { requireAuth: true }
-    },{
+    }, 
+    //{
+    //   path: '/page',
+    //   name: 'page',
+    //   component: page,
+    //   meta: { requireAuth: true }
+    // },
+    {
       path: '/artcategory',
       name: 'artcategory',
       component: artcategory,
@@ -154,6 +157,11 @@ const router = new Router({
       path: '/article',
       name: 'article',
       component: article,
+      meta: { requireAuth: false }
+    },{
+      path: '/artlist',
+      name: 'artlist',
+      component: artlist,
       meta: { requireAuth: false }
     },{
       path: "/admin",

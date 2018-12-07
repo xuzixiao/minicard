@@ -31,7 +31,6 @@
                      <video :src="videogroup" controls="controls" class="video"></video>
                    </div>
                 </div>
-                
             </div>
         </div>
     </div>
@@ -44,6 +43,9 @@
         <p>{{userinfo.branch}} · {{userinfo.office}}</p>
         <p>手机：{{userinfo.mobile}}</p>
         <p>微信：{{userinfo.wechat}}</p>
+        <p class="ewm" v-if="userinfo.wxewmimg!=''">
+            <img :src="userinfo.wxewmimg" />
+        </p>
     </div>
 </div>
 
@@ -58,51 +60,16 @@
         </p>
     </div>
 
-<div class="share">
-    <div :class="collect?'collect active':'collect'" @click="collect=!collect">
-        <i class="iconfont now">&#xe60c;</i>
-        <i class="iconfont end">&#xe812;</i>
-    </div>
-
-    <div class="idcard-btn" @click="idcardshow=true">
-        <i class="iconfont">&#xe61c;</i>
-    </div>
-    <div class="updatetome">
-        <div class="updatebtn">
-            <i class="iconfont">&#xe615;</i>
-            修改成我的
-        </div>
-    </div>
-</div>
-
-<div class="idcard-ceng" v-if="idcardshow" v-cloak>
-    <div class="ceng-main">
-        <van-icon name="close" class="close" @click="idcardshow=false" />
-        <div class="cenginfo">
-            <img :src="userinfo.headimg" class="userimg"/>
-            <p class="name">{{userinfo.name}}</p>
-            <p class="company">{{userinfo.company}} <p>
-            <p class="company">{{userinfo.branch}} · {{userinfo.office}}</p>
-            <div class="lxinfo">
-                <p><span>手机：</span>{{userinfo.mobile}}</p>
-                <p><span>微信：</span>{{userinfo.wechat}}</p>
-                <p><span>地址：</span>{{userinfo.address}}</p>
-                <p><span>主要经营：</span>{{userinfo.operate}}</p>
-            </div>
-        </div>
-        <div class="handle">
-            <button>保存到我的通讯录</button>
-        </div>
-    </div>
-</div>
 
 
+<share :userinfo="userinfo"></share>
 
 
 </div>
 </template>
 
 <script>
+import share from "@/components/share";
 export default {
   data() {
     return {
@@ -112,6 +79,9 @@ export default {
       artdata: "",
       userinfo: ""
     };
+  },
+  components:{
+    share:share
   },
   methods: {
     getarticle: function(articleid) {
@@ -284,7 +254,7 @@ video{
     line-height: 40px!important;
     color: #333!important;
 }
-.share{
+/* .share{
     width: 96%;
     height: 60px;
     border-top: #efefef solid 1px;
@@ -428,5 +398,10 @@ video{
     color: #666;
     border-radius: 50%;
     box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.2);
+} */
+.ewm img{
+    width: 150px;
+    height: auto;
+    margin-top: 20px;
 }
 </style>

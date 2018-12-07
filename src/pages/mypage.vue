@@ -54,6 +54,9 @@ export default {
         choose:function(){
             this.$router.push("/choosepage")
         }
+    },
+    mounted:function(){
+        
     }
 }
 </script>

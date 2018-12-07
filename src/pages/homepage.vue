@@ -37,7 +37,7 @@ export default {
         menudata:[
             {"menutit":"我的名片","path":"/mycard","iconclass":"idcard"},
             {"menutit":"文章中心","path":"/myarticle","iconclass":"records"},
-            {"menutit":"微单页","path":"/mypage","iconclass":"completed"},
+            {"menutit":"微单页","path":"/page?user=18888348998","iconclass":"completed"},
             {"menutit":"微链接","path":"/myurl","iconclass":"share"},
             {"menutit":"通讯录","path":"/myrecord","iconclass":"contact"},
             {"menutit":"我的收藏","path":"/mycollect","iconclass":"shop-collect"},

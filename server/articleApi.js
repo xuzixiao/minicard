@@ -141,6 +141,35 @@ router.post("/getartlist",function(req,res){
         })
     })
 })
+//根据分类Id获取文章列表
+//获取文章列表
+router.post("/artlist",function(req,res){
+    var getartlistsql=$sql.article.artlist;
+    var categoryid=req.body.categoryid;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(getartlistsql,[categoryid],function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                res.json({
+                    code:100,
+                    data:result
+                })
+            }
+            conn.release();
+        })
+    })
+})
+
+
+
+
+
+
 
 //获取文章内容
 //返回指定文章内容以及文章作者信息

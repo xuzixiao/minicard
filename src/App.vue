@@ -19,11 +19,11 @@ export default {
 }
 @font-face {
   font-family: 'iconfont';  /* project id 939141 */
-  src: url('//at.alicdn.com/t/font_939141_54i2ytzavew.eot');
-  src: url('//at.alicdn.com/t/font_939141_54i2ytzavew.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_939141_54i2ytzavew.woff') format('woff'),
-  url('//at.alicdn.com/t/font_939141_54i2ytzavew.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_939141_54i2ytzavew.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_939141_70izq6f6x1.eot');
+  src: url('//at.alicdn.com/t/font_939141_70izq6f6x1.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_939141_70izq6f6x1.woff') format('woff'),
+  url('//at.alicdn.com/t/font_939141_70izq6f6x1.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_939141_70izq6f6x1.svg#iconfont') format('svg');
 }
 .iconfont{
     font-family:"iconfont" !important;

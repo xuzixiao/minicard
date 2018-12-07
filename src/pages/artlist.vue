@@ -1,18 +1,9 @@
 <template>
 <div class="article">
-        <van-nav-bar 
-        title="文章列表" 
-        left-arrow
-        @click-left="$router.go(-1)"
-        />
-
 <div class="art-mian">
   <van-row class="art-main-title">
     <van-col span="8">
         <p><van-icon name="idcard"/>{{pagetitle}}</p>
-    </van-col>
-    <van-col span="16" style="text-align:right">
-       <van-button  size="small" @click="writeart">写文章</van-button>
     </van-col>
   </van-row>
 
@@ -66,15 +57,10 @@ export default {
     },
     methods:{
         getartlist:function(categoryid){
-            var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
-            if(user==null){
-                this.$router.push="/login";
-            }
             this.$axios({
-                url:"/api/article/getartlist",
+                url:"/api/article/artlist",
                 method:"POST",
                 data:{
-                    user:user,
                     categoryid:categoryid
                 }
             }).then((res)=>{
@@ -89,14 +75,6 @@ export default {
                 }
             },(res)=>{
                 console.log("====获取文章列表失败====");
-            })
-        },
-        writeart:function(){
-            this.$router.push({
-                path:"/writing",
-                query:{
-                    categoryid:this.categoryid
-                }
             })
         }
     }    

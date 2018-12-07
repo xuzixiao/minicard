@@ -3,6 +3,7 @@ const uploadfile=require('./uploadapi');
 const uploadpath=require('./uploadpath');
 const articleApi=require('./articleApi');
 const linkApi=require('./linkApi');
+const pageApi=require('./pageApi')
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -33,6 +34,8 @@ app.use('/api/user', userApi);
 app.use('/api/article', articleApi);
 //微链接
 app.use('/api/link', linkApi);
+//微单页
+app.use('/api/page', pageApi);
 //上传接口
 app.use('/api/upload',uploadfile)
 // 监听端口

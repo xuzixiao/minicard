@@ -17,7 +17,9 @@ var sqlMap = {
     article:{
         save:"Insert into article(user,artbanner,artcategoryid,arttitle,tuijian,artcon,createtime) value(?,?,?,?,?,?,?)",
         getartlist:"SELECT * FROM article WHERE user = ? and artcategoryid = ?",
-        getarticle:"SELECT * FROM article WHERE Id = ?"
+        getarticle:"SELECT * FROM article WHERE Id = ?",
+        getartcommend:"SELECT * FROM article WHERE user = ? and tuijian = 1",//获取用户文章推荐
+        artlist:"SELECT * FROM article WHERE artcategoryid = ?"
     },
     link:{
         setlink:"Insert into link(user,linkname,linkurl,createtime) value(?,?,?,?)",
