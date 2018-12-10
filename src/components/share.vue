@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div class="handle">
-                <button>保存到我的通讯录</button>
+                <button @click="save(userinfo.mobile)">保存到我的通讯录</button>
             </div>
         </div>
     </div>
@@ -46,6 +46,39 @@ export default {
         return{
             collect:false,
             idcardshow:false
+        }
+    },
+    methods:{
+        save:function(mobile){
+            if(!this.$cookie.getCookie("loginstate")){
+                this.$toast("登录失效,请重新登录")
+                setTimeout(() => {
+                    window.location.href="/login"
+                }, 800);
+                return;
+            }
+            var user= JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            if(mobile==user){
+                this.$toast("您不能添加自己为好友");
+                return;
+            }
+            this.$axios({
+                url:"/api/user/makefrineds",
+                method:"POST",
+                data:{
+                    user:user,
+                    frined:mobile
+                }
+            }).then((res)=>{
+                console.log(res);
+                if(res.data.code==0){
+                    this.$toast(res.data)
+                }else if(res.data.code==100){
+                    this.$toast("已成功保存到通讯录,您可以在通讯录内查看您的好友信息")
+                }
+            },(err)=>{
+                console.log(err);
+            })
         }
     }
 }

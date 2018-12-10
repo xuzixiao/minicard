@@ -508,6 +508,7 @@ export default {
     border: #eeeeee solid 0.5px;
     display: flex;
     align-items: center;
+    overflow:hidden;
 }
 .imggroup .img-single:nth-child(3n){
     margin-right: 0px;

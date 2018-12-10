@@ -215,7 +215,7 @@ export default {
 .tit{
     height: 50px;
     line-height: 25px;
-    overflow: height;
+    overflow:hidden;
     text-overflow:ellipsis;
 }
 .date{

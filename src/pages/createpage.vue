@@ -1,5 +1,6 @@
 <template>
 <div class="article">
+<div v-cloak v-if="!nothaveuser"> 
     <!-- <van-nav-bar 
         title="我的单页" 
         left-arrow
@@ -101,19 +102,19 @@
                 </div>
             </div>
         </div>
-
-
 <!-- 加微信 -->
-<div class="addweixin" v-if="showwx">
-    <div class="weixinmian">
-         <img :src="userinfo.wxewmimg" />
-         <i class="iconfont close" @click="showwx=false" >&#xe602;</i>
-    </div>
+        <div class="addweixin" v-if="showwx">
+            <div class="weixinmian">
+                <img :src="userinfo.wxewmimg" />
+                <i class="iconfont close" @click="showwx=false" >&#xe602;</i>
+            </div>
+        </div>
+        <share :userinfo="userinfo"></share>
 </div>
-
-<share :userinfo="userinfo"></share>
-
-
+<div class="nothaveuser" v-cloak v-if="nothaveuser">
+    <van-icon name="info-o" class="iconnotdata"/>
+    <span>暂无数据</span>
+</div>
 </div>
 </template>
 <script>
@@ -121,12 +122,14 @@ import share from "@/components/share";
 export default {
     data(){
         return{
+          user:"",
           userinfo:"",
           userlink:"",
           userart:"",
           artcommend:"",
           showwx:false,
-          idcardshow:true
+          idcardshow:true,
+          nothaveuser:false
         }
     },
     components:{
@@ -161,7 +164,7 @@ export default {
     created:function(){
         var user=this.$route.query.user;
         if(user==""||user==undefined||user==null){
-            this.$router.push("/login");
+            this.nothaveuser=true;
         }else{
             this.getpageinfo(user);
         }
@@ -404,7 +407,29 @@ export default {
     margin: 10px 0px;
     cursor: pointer;
 }
+.nothaveuser{
+    width:100%;
+    height:100px;
+    margin:100px 0;
+}
+.nothaveuser i{
+    display:back;
+    width:100%;
+    height:60px;
+    font-size:40px;
+    line-height:60px;
+    text-align:center;
+    color:#666666;
+}
+.nothaveuser span{
+    display:block;
+    width:100%;
+    height:40px;
+    font-size:20px;
+    text-align:center;
+    line-height:40px;
+    color:#666666;
 
-
+}
 </style>
 

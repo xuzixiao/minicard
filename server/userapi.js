@@ -182,8 +182,98 @@ router.post('/savecardinfo',(req,res) =>{
         })
     })
 })
-
-
+//获取用户好友
+//当前用户(user)，目标好友用户(frined)
+router.post('/makefrineds',(req,res)=>{
+    var params=req.body;
+    var getuserfrinedssql=$sql.user.getuserFrineds;
+    var setuserfrinedssql=$sql.user.setmakeFrineds
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(getuserfrinedssql,params.user,function(err,result){
+            if (err) {
+                    res.json({
+                        code:0,
+                        data:err
+                    });
+                }else{
+                    if(result[0].frineds!=""&&result[0].frineds!=null&&result[0].frineds.indexOf(params.frined)!=-1){
+                        res.json({
+                            code:0,
+                            data:"已经是好友了,不能重复添加"
+                        })
+                        return;
+                    }
+                    var frinedgroup=""
+                    if(result[0].frineds==null||result[0].frineds==""){
+                        frinedgroup=params.frined
+                    }else{
+                        frinedgroup=result[0].frineds+"|"+params.frined
+                    }
+                    conn.query(setuserfrinedssql,[frinedgroup,params.user],function(err,conn){
+                        if(err){
+                            res.json({
+                                code:0,
+                                data:err
+                            })
+                        }else{
+                            res.json({
+                                code:100,
+                                data:"添加好友成功"
+                            })
+                        }
+                    })
+                    conn.release();
+                }
+        })
+    })
+})
+//获取用户的好友
+//用户(user)
+router.post('/getfrineds',(req,res)=>{
+    var params=req.body;
+    var getuserfrinedsql=$sql.user.getuserFrineds;
+    var getfirnedinfo=$sql.user.userinfo;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(getuserfrinedsql,params.user,function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                conn.release();
+                var resultdata=result[0].frineds.split("|");
+                var frinedlist=[];
+                (function getfrinedlist(n){
+                    if(n>=resultdata.length){
+                        res.json({
+                            code:100,
+                            data:frinedlist
+                        })
+                        return;
+                    }
+                    pool.getConnection(function(err,conn){
+                        conn.query(getfirnedinfo,resultdata[n],function(err,result){
+                            if(err){
+                                res.json({
+                                    code:0,
+                                    data:err
+                                })
+                            }else{
+                                frinedlist.push(result[0]);
+                                n++;
+                                getfrinedlist(n);
+                            }
+                            conn.release();
+                        })
+                    })
+                })(0)
+            }
+        })
+    })
+})
 
 
 

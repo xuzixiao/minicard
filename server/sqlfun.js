@@ -12,7 +12,9 @@ var sqlMap = {
         addartimgs:'Insert into articleimg(user,image,createtime) value(?,?,?)',//保存文章图片
         getimagesql:'SELECT image FROM articleimg WHERE user = ?',//获取用户图片
         addvideosql:'Insert into uservideo(user,video,createtime) value(?,?,?)',//保存文章视频
-        getvideosql:'SELECT video FROM uservideo WHERE user = ?'  //获取用户上传的所有视频          
+        getvideosql:'SELECT video FROM uservideo WHERE user = ?',  //获取用户上传的所有视频
+        setmakeFrineds:'update userinfo set Frineds=? where mobile=?',//更新用户好友数据
+        getuserFrineds:'SELECT frineds FROM userinfo WHERE mobile = ?'//获取用户好友数据
     },
     article:{
         save:"Insert into article(user,artbanner,artcategoryid,arttitle,tuijian,artcon,createtime) value(?,?,?,?,?,?,?)",

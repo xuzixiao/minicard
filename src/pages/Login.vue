@@ -58,7 +58,7 @@ export default {
                     this.$toast(res.data.msg)
                 }else if(res.data.code==100){
                     this.$toast.success(res.data.msg);
-                    this.$router.push("/home");
+                    this.$router.push({path:"/home",query:{change:true}});
                 }
             },(res)=>{
                 this.$toast.clear();

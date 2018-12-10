@@ -164,6 +164,11 @@ export default {
             let categoryid=this.categoryid;//文章分类
             let arttitle=this.articletit;//文章标题
             let tuijian=this.tuijian;//文章推荐
+            if(tuijian){
+                tuijian=1;
+            }else{
+                tuijian=0;
+            }
             let artcon=this.$refs.article.articlecon//文章内容
             if(categoryid==""){
                 this.$toast("请选择文章所属分类");
