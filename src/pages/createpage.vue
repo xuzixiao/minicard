@@ -109,12 +109,12 @@
                 <i class="iconfont close" @click="showwx=false" >&#xe602;</i>
             </div>
         </div>
-        <share :userinfo="userinfo"></share>
 </div>
 <div class="nothaveuser" v-cloak v-if="nothaveuser">
     <van-icon name="info-o" class="iconnotdata"/>
     <span>暂无数据</span>
 </div>
+<share :userinfo="userinfo" :collectfun="false"></share>
 </div>
 </template>
 <script>

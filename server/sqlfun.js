@@ -21,13 +21,16 @@ var sqlMap = {
         getartlist:"SELECT * FROM article WHERE user = ? and artcategoryid = ?",
         getarticle:"SELECT * FROM article WHERE Id = ?",
         getartcommend:"SELECT * FROM article WHERE user = ? and tuijian = 1",//获取用户文章推荐
-        artlist:"SELECT * FROM article WHERE artcategoryid = ?"
+        artlist:"SELECT * FROM article WHERE artcategoryid = ?",
+        collart:"update userinfo set collarticle=? where mobile=?",  //收藏文章
+        getcollart:"SELECT collarticle FROM userinfo WHERE mobile = ?",//获取收藏的文章
+        readtime:"update article set browse=? where Id=?" //阅读次数
     },
     link:{
-        setlink:"Insert into link(user,linkname,linkurl,createtime) value(?,?,?,?)",
-        getlink:"SELECT * FROM link WHERE user = ? ",
-        updatelink:"UPDATE link SET linkname = ?,linkurl = ? where Id = ?",
-        dellink:"DELETE from link where Id = ?"
+        setlink:"Insert into link(user,linkname,linkurl,createtime) value(?,?,?,?)",//添加超链接
+        getlink:"SELECT * FROM link WHERE user = ? ",//获取超链接
+        updatelink:"UPDATE link SET linkname = ?,linkurl = ? where Id = ?",//更新超链接
+        dellink:"DELETE from link where Id = ?"//删除超链接   
     }
 }
 module.exports = sqlMap;

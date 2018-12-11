@@ -1,9 +1,7 @@
 <template>
     <div class="login">
         <h2>正阳堂微名片系统</h2>
-
         <h3>登录</h3>
-        
         <div class="card-main">
             <van-field
                 v-model="logininfo.username"
@@ -12,7 +10,6 @@
                 label="手机号"
                 placeholder="请输入登录手机号"
             />
-
             <van-field
                 v-model="logininfo.password"
                 type="password"
@@ -20,9 +17,7 @@
                 placeholder="请输入密码"
                 required
             />  
-            <p class="tiptext">
-                <router-link to="/register">没有账号？去注册</router-link>
-            </p>
+            <p class="tiptext"><router-link to="/register">没有账号？去注册</router-link></p>
             <van-button type="primary" size="large" class="loginbtn" @click="loginfun">登录</van-button>
         </div>
     </div>
@@ -58,14 +53,21 @@ export default {
                     this.$toast(res.data.msg)
                 }else if(res.data.code==100){
                     this.$toast.success(res.data.msg);
-                    this.$router.push({path:"/home",query:{change:true}});
+                    if(this.$route.query.user!=undefined){
+                        this.$router.push({path:"/page",query:{user:this.$route.query.user}});
+                    }else if(this.$route.query.articleid!=undefined){
+                        this.$router.push({path:"/article",query:{article:this.$route.query.articleid}});
+                    }else if(this.$route.query.path!=undefined&&this.$route.query.path!="/"){
+                        this.$router.push(this.$route.query.path);
+                    }else{
+                        this.$router.push({path:"/home",query:{change:true}});
+                    }
                 }
             },(res)=>{
                 this.$toast.clear();
                 this.$toast("系统错误,请您稍后重试")
             })
             }
-
     },
     mounted:function(){
          this.$axios({

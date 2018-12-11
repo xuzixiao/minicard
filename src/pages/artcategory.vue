@@ -3,7 +3,7 @@
         <van-nav-bar 
         title="文章列表" 
         left-arrow
-        @click-left="$router.go(-1)"
+        @click-left="$router.push('/home')"
         />
 
 <div class="art-mian">

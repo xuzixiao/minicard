@@ -8,7 +8,7 @@
         />
 
     <div class="record">
-        <div v-for="item in frineds">
+        <div v-for="item in frineds" :key="index" v-if="havefrined">
             <router-link :to="{path:'/page',query:{user:item.mobile}}" class="recordlist">
             <div class="record-hdimg">
                 <img :src="item.headimg==null||item.headimg==''?'static/images/morenheadimg.png':item.headimg" />
@@ -20,6 +20,12 @@
             </div>
             </router-link>
         </div> 
+
+        <div class="havefrined" v-if="!havefrined">
+            <van-icon name="info-o" />
+            暂无好友
+        </div>
+
     </div>    
 
 </div>
@@ -31,6 +37,15 @@ export default {
         return{
             pagetitle:"我的通讯录",
             frineds:[]
+        }
+    },
+    computed:{
+        havefrined:function(){
+            if(this.frineds.length==0){
+                return false;
+            }else{
+                return true;
+            }
         }
     },
     methods:{
@@ -54,7 +69,11 @@ export default {
                 }
             }).then((res)=>{
                 if(res.data.code==100){
+                    if(res.data[0]==null){
+                    this.frineds=[]    
+                    }else{
                     this.frineds=res.data.data;
+                    }
                 }
             },(err)=>{
                 console.log(err);
@@ -95,6 +114,21 @@ export default {
     color: #333;
     font-size: 14px;
     line-height: 25px;
+}
+.havefrined{
+    width: 100px;
+    text-align: center;
+    line-height: 30px;
+    margin: 20px auto;
+}
+.havefrined i{
+    display: block;
+    font-size: 20px;
+    line-height: 30px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    float: left;
 }
 </style>
 

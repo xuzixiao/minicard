@@ -41,8 +41,8 @@ import artcategory from '@/pages/artcategory'
 import article from '@/pages/article'
 //文章列表
 import artlist from '@/pages/artlist'
-
-
+//修改文章
+import updatearticle from '@/pages/updatearticle'
 
 Vue.use(Router)
 
@@ -142,6 +142,12 @@ const router = new Router({
       component: Writing,
       meta: { requireAuth: true }
     }, 
+    {
+      path:"/updatearticle",
+      name:"updatearticle",
+      component:updatearticle,
+      meta:{ requireAuth: true }
+    },
     //{
     //   path: '/page',
     //   name: 'page',
@@ -188,11 +194,12 @@ router.beforeEach((to, from, next) => {
     next()
   } else { //当进入的是不是登录页面时
     if (!loginstate && to.meta.requireAuth) {
+      var topath=String(to.fullPath);
       next(
         {
           path: '/login',
           query: {
-            'path': from.fullPath
+            'path': topath
           }
         }
       )

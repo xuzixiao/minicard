@@ -165,12 +165,6 @@ router.post("/artlist",function(req,res){
     })
 })
 
-
-
-
-
-
-
 //获取文章内容
 //返回指定文章内容以及文章作者信息
 router.post("/getarticle",function(req,res){
@@ -186,28 +180,134 @@ router.post("/getarticle",function(req,res){
                 })
             }else{
              var resdata=result[0];
-             var getuserinforsql=$sql.user.userinfo;
-             conn.query(getuserinforsql,resdata.user,function(err,result){
-                if(err){
-                    res.json({
-                        code:0,
-                        data:err
+             var readtime=result[0].browse+1;//阅读次数
+             var browsesql=$sql.article.readtime;
+             conn.query(browsesql,[readtime,Id],function(err,result){
+                 if(err){
+                     res.json({
+                         code:0,
+                         data:err
+                     })
+                 }else{
+                    var getuserinforsql=$sql.user.userinfo;
+                    conn.query(getuserinforsql,resdata.user,function(err,result){
+                        if(err){
+                            res.json({
+                                code:0,
+                                data:err
+                            })
+                        }else{
+                            var data={article:resdata,userinfo:result[0]};
+                            res.json({
+                                code:100,
+                                data:data
+                            })
+                        }
+                        conn.release();
                     })
-                }else{
-                    var data={article:resdata,userinfo:result[0]};
-                    res.json({
-                        code:100,
-                        data:data
-                    })
-                }
-             })
+                 }
+            })             
             }
-            conn.release();
         })
     })
 })
 
-
+//收藏文章
+router.post("/collectart",function(req,res){
+    var getcollsql=$sql.article.getcollart;//获取收藏的文章(user)
+    var setcollsql=$sql.article.collart;//收藏的文章(user,articleid)
+    var user=req.body.user;
+    var artid=req.body.artid;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(getcollsql,user,function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                var collarticle=result[0].collarticle;
+                if(collarticle!=null&&collarticle!=""&&collarticle.indexOf(artid)!=-1){
+                    res.json({
+                        code:0,
+                        data:"已经收藏"
+                    })
+                    return;
+                }
+                if(collarticle==""||collarticle==null||collarticle==undefined){
+                    collarticle=artid;
+                }else{
+                    collarticle=collarticle+"|"+artid;
+                }
+                conn.release();
+                pool.getConnection(function(err,conn){
+                    err?handleerror(err,res):
+                    conn.query(setcollsql,[collarticle,user],function(err,result){
+                        if(err){
+                            res.json({
+                                code:0,
+                                data:err
+                            })
+                        }else{
+                            res.json({
+                                code:100,
+                                data:"收藏成功"
+                            })
+                        }
+                        conn.release();
+                    })
+                })
+            }
+        })
+    })
+})
+//获取收藏
+router.post("/getcollect",function(req,res){
+    var user=req.body.user;
+    var getcollart=$sql.article.getcollart;
+    var getarticle=$sql.article.getarticle;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(getcollart,user,function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                var collarticle=result[0].collarticle.split("|")
+                conn.release();
+                var artgroup=[];
+                (function getartmain(n){
+                    if(n>collarticle.length-1){
+                        res.json({
+                            code:100,
+                            data:artgroup
+                        })
+                        return;
+                    }
+                    pool.getConnection(function(err,conn){
+                        err?handleerror(err,res):
+                        conn.query(getarticle,collarticle[n],function(err,result){
+                            if(err){
+                                res.json({
+                                    code:0,
+                                    data:err
+                                })
+                            }else{
+                                artgroup.push(result[0]);
+                            }
+                            conn.release();
+                            n++;
+                            getartmain(n)
+                        })
+                    })
+                })(0)
+            }
+        })
+    })
+})
 
 
 

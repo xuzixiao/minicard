@@ -1,18 +1,22 @@
 <template>
 <div>
     <div class="share">
-        <div :class="collect?'collect active':'collect'" @click="collect=!collect">
+        <div :class="collect?'collect active':'collect'" @click="collfun" v-if="collectfun">
             <i class="iconfont now">&#xe60c;</i>
             <i class="iconfont end">&#xe812;</i>
+        </div>
+
+        <div class="collect" @click="save(userinfo.mobile)">
+            <i class="iconfont now">&#xe75c;</i>
         </div>
 
         <div class="idcard-btn" @click="idcardshow=true">
             <i class="iconfont">&#xe61c;</i>
         </div>
         <div class="updatetome">
-            <div class="updatebtn">
+            <div class="updatebtn" @click="updateme()">
                 <i class="iconfont">&#xe615;</i>
-                修改成我的
+                {{collectfun?'修改成我的':'创建成我的名片'}}
             </div>
         </div>
     </div>
@@ -41,7 +45,7 @@
 </template>
 <script>
 export default {
-    props:["userinfo"],
+    props:["userinfo","collectfun","articleid"],
     data(){
         return{
             collect:false,
@@ -51,7 +55,7 @@ export default {
     methods:{
         save:function(mobile){
             if(!this.$cookie.getCookie("loginstate")){
-                this.$toast("登录失效,请重新登录")
+                this.$toast("您还未登录,请登录后操作");
                 setTimeout(() => {
                     window.location.href="/login"
                 }, 800);
@@ -72,13 +76,82 @@ export default {
             }).then((res)=>{
                 console.log(res);
                 if(res.data.code==0){
-                    this.$toast(res.data)
+                    this.$toast(res.data.data)
                 }else if(res.data.code==100){
-                    this.$toast("已成功保存到通讯录,您可以在通讯录内查看您的好友信息")
+                    this.$toast("已成功保存到通讯录")
                 }
             },(err)=>{
                 console.log(err);
             })
+        },
+        collfun:function(){
+             if(!this.$cookie.getCookie("loginstate")){
+                this.$toast("您还未登录,请登录后操作");
+                setTimeout(() => {
+                    window.location.href="/login"
+                }, 800);
+                return;
+            }
+            var user= JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            var artid=this.articleid;
+            
+            this.$axios({
+                url:"/api/article/collectart",
+                method:"POST",
+                data:{
+                    user:user,
+                    artid:artid
+                }
+            }).then((res)=>{
+                if(res.data.code==100){
+                    this.$toast("收藏成功");
+                    this.collect=true;
+                }else{
+                     this.$toast(res.data.data);
+                     this.collect=true;
+                }
+            },(err)=>{
+                console.log(err);
+            })
+        },
+        updateme:function(){
+             if(!this.$cookie.getCookie("loginstate")){//如果未登录
+                this.$toast("您还未登录,请登录后操作");
+                if(this.collectfun){//文章
+                    //console.log(this.articleid);
+                    this.$router.push({
+                        path:"/login",
+                        query:{
+                            articleid:this.articleid
+                        }
+                    })
+                }else{//单页
+                    this.$router.push({
+                        path:"/login",
+                        query:{
+                            user:this.userinfo.mobile
+                        }
+                    })
+                    console.log(this.userinfo.mobile);
+
+                }
+            }else{//如果已登录
+                //var user= JSON.parse(this.$cookie.getCookie("loginstate")).user;
+                if(this.collectfun){//文章
+                    this.$router.push({
+                        path:"/updatearticle",
+                        query:{
+                            articleid:this.articleid
+                        }
+                    })
+                }else{//单页
+                    this.$dialog.alert({
+                        message: '完善个人名片信息，写完文章后，自动生成微单页'
+                    }).then(() => {
+                        this.$router.push("/home")
+                    })
+                }
+            }
         }
     }
 }
@@ -127,13 +200,14 @@ export default {
 }
 .updatetome{
     float: right;
-    width: 60%;
+    width: 45%;
     height: 60px;
 }
 .updatetome .updatebtn{
     width: 100%;
     height:40px;
     line-height: 40px;
+    font-size: 16px;
     background: #2c9af9;
     color: #ffffff;
     text-align: center;

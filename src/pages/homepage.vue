@@ -42,7 +42,7 @@
 export default {
   data() {
     return {
-        scrolltext:"正阳堂微名片管理系统正阳堂微名片管理系统正式上线正阳堂微名片管理系统正阳堂微名片管理系统正式上线", 
+        scrolltext:"正阳科技微名片系统正式上线", 
         menudata:[
             {"menutit":"我的名片","path":"/mycard","iconclass":"idcard"},
             {"menutit":"文章中心","path":"/myarticle","iconclass":"records"},
