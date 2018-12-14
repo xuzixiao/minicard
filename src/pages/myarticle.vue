@@ -20,7 +20,8 @@
 
     <div v-cloak class="art-list"  v-if="havecategory">
         <van-row gutter='10'>
-            <van-col span="8" v-for="(item,index) in category" :key="index">
+            <van-col span="8" v-for="(item,index) in category" :key="index" class="list">
+                <van-icon name="delete" class="delthis" @click="delthiscategory(item.id)" />
                 <div class="navlist" @click="choosecategory(item.id,item.categoryname)">
                     <van-icon name="tosend" />
                     <p>{{item.categoryname}}</p>
@@ -139,6 +140,38 @@ export default {
                     categoryname:categoryname
                 }
             })
+        },
+        delthiscategory:function(categoryid){
+            var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            if(user==null){
+                this.$router.push="/login";
+            }
+            this.$dialog.confirm({
+                message: '确定要删除此条文章分类吗'
+            }).then(() => {
+            this.$axios({
+                url:"/api/article/deletecate",
+                method:"POST",
+                data:{
+                    user:user,
+                    categoryid:categoryid
+                }
+            }).then((res)=>{
+                if(res.data.code==100){
+                    this.$toast("删除分类成功");
+                    this.getcategory();
+                }else{
+                    this.$dialog.alert({
+                        message: res.data.data
+                    })
+                }
+            },(err)=>{
+                console.log(err);
+            })
+            
+            }).catch(() => {
+            // on cancel
+            });
         }
     },
     created:function(){
@@ -193,6 +226,7 @@ export default {
     padding: 10px 0px;
     border-radius: 4px;
     margin-bottom: 10px;
+    position: relative;
 }
 .navlist i{
     width: 100%;
@@ -228,6 +262,25 @@ export default {
     line-height: 40px;
     background: #50b7c1;
     color: #ffffff;
+}
+.delthis{
+    display: block!important;
+    width: 26px!important;
+    height: 26px!important;
+    background: #ffffff!important;
+    color: #666!important;
+    font-size: 12px!important;
+    border-radius: 50%;
+    line-height: 26px;
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    z-index: 10;
+    text-align: center;
+    cursor: pointer;
+}
+.list{
+    position: relative;
 }
 </style>
 

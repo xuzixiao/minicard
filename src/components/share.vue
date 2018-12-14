@@ -94,7 +94,6 @@ export default {
             }
             var user= JSON.parse(this.$cookie.getCookie("loginstate")).user;
             var artid=this.articleid;
-            
             this.$axios({
                 url:"/api/article/collectart",
                 method:"POST",
@@ -136,19 +135,27 @@ export default {
 
                 }
             }else{//如果已登录
-                //var user= JSON.parse(this.$cookie.getCookie("loginstate")).user;
+                var user= JSON.parse(this.$cookie.getCookie("loginstate")).user;
                 if(this.collectfun){//文章
-                    this.$router.push({
-                        path:"/updatearticle",
-                        query:{
-                            articleid:this.articleid
-                        }
-                    })
+                    if(this.userinfo.mobile==user){
+                        this.$dialog.alert({
+                            message: '当前文章为您本人文章，您可以去文章列表进行修改'
+                        }).then(() => {})
+                    }else{
+                        this.$router.push({
+                            path:"/makeittome",
+                            query:{
+                                articleid:this.articleid
+                            }
+                        })
+                    }    
                 }else{//单页
                     this.$dialog.alert({
-                        message: '完善个人名片信息，写完文章后，自动生成微单页'
+                        message: '完善您的信息,自动生成微单页'
                     }).then(() => {
-                        this.$router.push("/home")
+                        this.$router.push({
+                            path:"/home"
+                        })
                     })
                 }
             }

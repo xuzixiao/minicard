@@ -43,6 +43,10 @@ import article from '@/pages/article'
 import artlist from '@/pages/artlist'
 //修改文章
 import updatearticle from '@/pages/updatearticle'
+//修改成我的文章
+import makeittome from '@/pages/makeittome'
+
+
 
 Vue.use(Router)
 
@@ -147,6 +151,11 @@ const router = new Router({
       name:"updatearticle",
       component:updatearticle,
       meta:{ requireAuth: true }
+    },{
+      path:"/makeittome",
+      name:"makeittome",
+      component:makeittome,
+      meta:{requireAuth:true }
     },
     //{
     //   path: '/page',
@@ -208,4 +217,5 @@ router.beforeEach((to, from, next) => {
     }
   }
 })
+
 export default router;

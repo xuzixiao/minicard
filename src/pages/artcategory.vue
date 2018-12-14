@@ -18,15 +18,25 @@
 
     <div v-cloak class="art-list" v-if="haveart" v-cloak>
         <div v-for="item,index in artlist" :key="index">
-            <router-link target="_blank" :to="{path:'/article',query:{article:item.Id}}" class="art">
-            <div class="art-img">
-                <img :src="item.artbanner" />
+            <div class="art">
+                <div class="art-img">
+                    <router-link target="_blank" :to="{path:'/article',query:{article:item.Id}}">
+                    <img :src="item.artbanner" />
+                    </router-link>
+                </div>
+                <div class="art-info">
+                    <router-link target="_blank" :to="{path:'/article',query:{article:item.Id}}">
+                    <p class="tit">{{item.arttitle}}</p>
+                    <p class="date"><span>{{item.createtime.split(" ")[0]}}</span></p>
+                    </router-link>
+                    <p class="arthand">
+                        <router-link :to="{path:'/updatearticle',query:{articleid:item.Id}}" class="arthandbtn">
+                            修改文章
+                        </router-link>
+                        <button class="arthandbtn" @click="delart(item.Id)">删除文章</button>
+                    </p>
+                </div>
             </div>
-            <div class="art-info">
-                <p class="tit">{{item.arttitle}}</p>
-                <p class="date"><span>{{item.createtime.split(" ")[0]}}</span></p>
-            </div>
-            </router-link>
         </div>
     </div>
 
@@ -66,6 +76,9 @@ export default {
     },
     methods:{
         getartlist:function(categoryid){
+            if(!categoryid){
+                categoryid=this.categoryid
+            }
             var user=JSON.parse(this.$cookie.getCookie("loginstate")).user;
             if(user==null){
                 this.$router.push="/login";
@@ -98,6 +111,39 @@ export default {
                     categoryid:this.categoryid
                 }
             })
+        },
+        delart:function(artid){
+            if(!this.$cookie.getCookie("loginstate")){
+                this.$toast("您还未登录,请登录后操作");
+                setTimeout(() => {
+                    window.location.href="/login"
+                }, 800);
+                return;
+            }
+            var user= JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            this.$dialog.confirm({
+                title: '删除提示',
+                message: '确定要删除此篇文章吗，删除后不可恢复'
+                }).then(() => {
+                    this.$axios({
+                        url:"/api/article/delarticle",
+                        method:"POST",
+                        data:{
+                            user:user,
+                            artid:artid
+                        }
+                    }).then(res=>{
+                        console.log(res);
+                        this.$toast(res.data.data)
+                        if(res.data.code==100){
+                            this.getartlist();
+                        }
+                    },err=>{
+                        console.log(err);   
+                    })
+                }).catch(() => {
+                    console.log("no");
+            });
         }
     }    
 }
@@ -188,7 +234,7 @@ export default {
 }
 .art{
     width: 100%;
-    height: 100px;
+    height: auto;
     border-bottom: #eee dashed 1px;
     display: flex;
     padding: 10px 0px;
@@ -220,6 +266,19 @@ export default {
 }
 .date{
     text-align: right;
+    line-height: 20px;
+}
+.arthand{
+    display: flex;
+    justify-content:flex-end;
+}
+.arthand .arthandbtn{
+    background: #50b7c1;
+    color: #ffffff;
+    border: none;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 4px;
     line-height: 20px;
 }
 </style>

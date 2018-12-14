@@ -10,8 +10,8 @@
         <div class="box">
             
             <div class="uploadbgimg">
-                <div class="text"><van-icon name="photo" class="texticon" />上传封面图片</div>
-                <img :src="artbanner"  v-if="hasbannerimg" class="uploadimg" />
+                <img :src="artbanner"  v-if="hasbannerimg" class="ban_img" />
+                <div class="text" v-if="!hasbannerimg"><van-icon name="photo" class="texticon" />上传封面图片</div>
                 <van-uploader :after-read="uploadheadimg" accept="image/gif, image/jpeg"  class="choosefile"></van-uploader>
                 <span class="closeimg" v-if="hasbannerimg" @click="delfmimg">
                     <van-icon name="close" />
@@ -293,17 +293,22 @@ flex-wrap: wrap;
 }
 .uploadbgimg{
     width: 100%;
-    height: 110px;
+    height: auto;
     border-radius: 5px;
-    border: #d5d5d5 dashed 1px;
+    min-height: 150px;
+    border: #d5d5d5 dashed 1px; 
     position: relative;
 }
 .uploadbgimg .text{
+    position: absolute;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    top: 45%;
     text-align: center;
     font-size: 14px;
     color: #d5d5d5;
     line-height: 30px;
-    margin-top: 40px;
 }
 .uploadbgimg .texticon{
     margin-right: 10px;
@@ -372,5 +377,9 @@ flex-wrap: wrap;
     color: #666;
     text-align: center;
     line-height: 25px;
+}
+.ban_img{
+    width: 100%;
+    height: auto;
 }
 </style>

@@ -94,7 +94,7 @@ export default {
       }).then(
           (res)=>{
              if(res.data.code==100){
-                 this.userinfo.headimg=res.data.data
+                 this.userinfo.headimg=res.data.data+"?t="+parseInt(Math.random()*100);
              }else{
                  this.$toast(res.data.data);
                  if(res.data.code==50){
@@ -121,7 +121,7 @@ export default {
       }).then(
           (res)=>{
              if(res.data.code==100){
-                 this.userinfo.wxewmimg=res.data.data
+                 this.userinfo.wxewmimg=res.data.data+"?t="+parseInt(Math.random()*100);
              }else{
                  this.$toast(res.data.data);
                  if(res.data.code==50){

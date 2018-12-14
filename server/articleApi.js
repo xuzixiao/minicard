@@ -86,6 +86,53 @@ router.post('/setcategory',(req,res) =>{
         })
     })
 })
+//删除文章分类
+
+router.post("/deletecate",function(req,res){
+    var categoryid=req.body.categoryid;
+    var user=req.body.user;
+    var testsql=$sql.article.artlist;
+    var delcate=$sql.article.delcategory;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(testsql,categoryid,function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                conn.release();
+                if(result.length==0){
+                    pool.getConnection(function(err,conn){
+                        err?handleerror(err,res):
+                        conn.query(delcate,[categoryid,user],function(err,result){
+                            if(err){
+                                res.json({
+                                    code:0,
+                                    data:err
+                                })
+                            }else{
+                                res.json({
+                                    code:100,
+                                    data:result
+                                })
+                            }
+                            conn.release();
+                        })
+                    })
+                }else{
+                    res.json({
+                        code:0,
+                        data:"当前分类内有文章,不能删除分类。"
+                    })
+                }
+            }
+        })
+    })
+})
+
+
 
 //保存文章
 router.post("/savearticle",function(req,res){
@@ -116,6 +163,33 @@ router.post("/savearticle",function(req,res){
         })
     })
 
+})
+//修改文章
+router.post("/updatearticle",function(req,res){
+    var updateartsql=$sql.article.updatearticle;
+    var id=req.body.articleid;
+    var artbanner=req.body.artbanner;
+    var artcategoryid=req.body.artcategoryid;
+    var arttitle=req.body.arttitle;
+    var tuijian=req.body.tuijian;
+    var artcon=req.body.artcon;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(updateartsql,[artbanner,artcategoryid,arttitle,tuijian,artcon,id],function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                res.json({
+                    code:100,
+                    data:"修改成功"
+                })
+            }
+            conn.release();
+        })
+    })
 })
 
 //获取文章列表
@@ -165,7 +239,7 @@ router.post("/artlist",function(req,res){
     })
 })
 
-//获取文章内容
+//获取文章内容 展示用
 //返回指定文章内容以及文章作者信息
 router.post("/getarticle",function(req,res){
     var sql=$sql.article.getarticle;
@@ -180,6 +254,13 @@ router.post("/getarticle",function(req,res){
                 })
             }else{
              var resdata=result[0];
+             if(resdata==undefined){
+                 res.json({
+                     code:0,
+                     data:"文章不存在"
+                 })
+                 return;
+             }
              var readtime=result[0].browse+1;//阅读次数
              var browsesql=$sql.article.readtime;
              conn.query(browsesql,[readtime,Id],function(err,result){
@@ -208,6 +289,53 @@ router.post("/getarticle",function(req,res){
                  }
             })             
             }
+        })
+    })
+})
+
+//修改文章-获取文章内容
+router.post("/getupdateartcon",function(req,res){
+    let user=req.body.user;
+    let artid=req.body.Id;
+    let getartofupdate=$sql.article.getartofupdate;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(getartofupdate,[user,artid],function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                res.json({
+                    code:100,
+                    data:result[0]
+                })
+            }
+            conn.release();
+        })
+    })
+})
+
+//修改成我的文章-获取文章内容
+router.post("/getupdatearticle",function(req,res){
+    let artid=req.body.Id;
+    let getartofupdate=$sql.article.getarticle;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(getartofupdate,artid,function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                res.json({
+                    code:100,
+                    data:result[0]
+                })
+            }
+            conn.release();
         })
     })
 })
@@ -308,7 +436,52 @@ router.post("/getcollect",function(req,res){
         })
     })
 })
-
+//删除文章
+//user,artid
+router.post("/delarticle",function(req,res){
+    let user=req.body.user;
+    let artid=req.body.artid;
+    //判断删除权限
+    let testsql=$sql.article.getarticle;
+    let delectsql=$sql.article.delectsql;
+    pool.getConnection(function(err,conn){
+        err?handleerror(err,res):
+        conn.query(testsql,artid,function(err,result){
+            if(err){
+                res.json({
+                    code:0,
+                    data:err
+                })
+            }else{
+                conn.release();
+                if(result[0].user!=user){
+                    res.json({
+                        code:0,
+                        data:"您无权限删除此文章"
+                    })
+                }else{
+                    pool.getConnection(function(err,conn){
+                        err?handleerror(err,res):
+                        conn.query(delectsql,[user,artid],function(err,result){
+                            if(err){
+                                res.json({
+                                    code:0,
+                                    data:err
+                                })
+                            }else{
+                                res.json({
+                                    code:100,
+                                    data:"删除成功"
+                                })
+                            }
+                            conn.release();
+                        })
+                    })
+                }
+            }
+        })
+    })
+})
 
 
 

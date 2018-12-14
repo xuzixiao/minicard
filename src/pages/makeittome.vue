@@ -1,7 +1,7 @@
 <template>
     <div class="main">
         <van-nav-bar 
-        title="修改文章" 
+        title="修改成我的文章" 
         left-text=""
         left-arrow
         @click-left="$router.go(-1)"
@@ -20,8 +20,9 @@
 
             <div class="line">
                 <div class="line-label"><span>文章类别</span></div>
-                <div class="line-main">
-                    <van-field :value="categoryname" placeholder="请选择文章类别" readonly  class="input" @click="chooseartfl=true" />
+                <div class="line-main" style="display:flex;">
+                    <van-field :value="categoryname" placeholder="请选择文章类别" readonly  class="input" @click="category==''?showaddcate=true:chooseartfl=true" style="width:75%" />
+                    <span class="creatflbtn" @click="showaddcate=true" >创建分类</span>
                 </div>
             </div>
 
@@ -47,7 +48,7 @@
 
                 </div>
             </div>
-            <van-button size="large" class="savecard" @click="saveart">修改文章</van-button>
+            <van-button size="large" class="savecard" @click="saveart">提交修改</van-button>
         </div>
 
 
@@ -59,6 +60,19 @@
         </ul>
     </van-actionsheet>
 
+    <van-popup v-model="showaddcate" class="alertbox">
+        <div>
+            <p>
+                <span>创建文章分类</span>
+                <van-icon name="close" @click="showaddcate=false" />    
+            </p>
+            <van-field v-model="creatcategoryname" label="分类名称" placeholder="请输入分类名称" />
+            <van-button size="large" class="savecard" @click="setcategory">创建分类</van-button>
+        </div>
+    </van-popup>
+
+
+
     </div>
 </template>
 <script>
@@ -66,6 +80,7 @@ import CreatedAritle from '@/components/creatarticle'
 export default {
     data(){
         return{
+            showaddcate:false,
             artdata:"",
             artbanner:"",
             articletit:"",
@@ -73,7 +88,8 @@ export default {
             chooseartfl:false,
             categoryid:"",
             category:"",//文章分类
-            articleid:""
+            articleid:"",
+            creatcategoryname:""
         }
     },
     computed:{
@@ -138,9 +154,10 @@ export default {
                 if(res.data.code==100){
                     if(res.data.data.length==0){
                         this.$toast('您还没有创建文章分类,创建分类后才能写文章哦~');
+                        this.showaddcate=true;
                        var vm=this;
                        setTimeout(function(){
-                           vm.$router.go(-1);
+                           //vm.$router.go(-1);
                        },1000)
                     }else{
                         this.category=res.data.data;
@@ -189,10 +206,10 @@ export default {
             //文章内容为string
             artcon=JSON.stringify(artcon);
             this.$axios({
-                url:"/api/article/updatearticle",
+                url:"/api/article/savearticle",
                 method:"POST",
                 data:{
-                    articleid:this.articleid,
+                    user:user,
                     artbanner:bannerimg,
                     artcategoryid:categoryid,
                     arttitle:arttitle,
@@ -205,7 +222,7 @@ export default {
                        this.$toast("修改成功");
                        var that=this;
                        setTimeout(function(){
-                        that.$router.go(-1);    
+                        that.$router.push("/myarticle");    
                        },500)
                     }
                 },
@@ -225,11 +242,10 @@ export default {
             var user= JSON.parse(this.$cookie.getCookie("loginstate")).user;
             if(this.$route.query.articleid){
                 this.$axios({
-                    url: "/api/article/getupdateartcon",
+                    url: "/api/article/getupdatearticle",
                     method: "POST",
                     data: {
                         Id: this.$route.query.articleid,
-                        user:user
                     }
                 }).then(
                     res => {
@@ -241,10 +257,9 @@ export default {
                             this.articletit=article.arttitle;
                             this.$refs.article.articlecon=article.artcon;
                             article.tuijian==1?this.tuijian=true:this.tuijian=false;
-                            this.categoryid=article.artcategoryid;
                         } else if(res.data.data==undefined) {
                             this.$dialog.alert({
-                                message:"您无权限修改此篇文章"
+                                message:"当前文章异常。"
                             }).then(()=>{
                                 this.$router.go(-1);
                             })
@@ -257,7 +272,49 @@ export default {
                     }
                 );
             }
-        }
+        },
+        setcategory:function(){//创建分类
+             if(this.creatcategoryname==""){
+                 this.$toast("分类名称不能为空");
+                 return;
+             }
+             if(!this.$cookie.getCookie("loginstate")){
+                this.$toast("您还未登录,请登录后操作");
+                var that=this;
+                setTimeout(() => {
+                    that.$router({
+                        path:"/login",
+                        query:{
+                            path:that.$route.fullpath
+                        }
+                    })
+                }, 800);
+                return;
+            }
+            var user= JSON.parse(this.$cookie.getCookie("loginstate")).user;
+            this.$axios({
+                url:"/api/article/setcategory",
+                method:"POST",
+                data:{
+                    categoryname:this.creatcategoryname,
+                    userid:user
+                }
+            }).then(
+                (res)=>{
+                    if(res.data.code==0){
+                        this.$toast(res.data.data);
+                    }else{
+                        this.$toast("添加成功");                        
+                        this.showaddcate=false;
+                        this.creatcategoryname="";
+                        this.getcategory();
+                    }
+                },
+                (res)=>{
+                    this.$toast("添加分类失败");
+                }
+            )
+        },
 
     },
     created:function(){
@@ -269,7 +326,6 @@ export default {
         }
         this.getcategory();
         this.getartmain();
-        
     },
     mounted:function(){
 
@@ -435,5 +491,36 @@ flex-wrap: wrap;
 .ban_img{
     width: 100%;
     height: auto;
+}
+.alertbox{
+    width: 80%;
+    padding: 10px;
+    border-radius: 5px;
+}
+.alertbox i{
+    float: right;
+    font-size: 24px;
+    color: #666;
+}
+.alertbox span{
+    color: #666;
+}
+.alertbox button{
+    margin-top: 10px;
+    height: 40px;
+    line-height: 40px;
+    background: #50b7c1;
+    color: #ffffff;
+    margin-bottom: 0px;
+}
+.creatflbtn{
+    width:30%;
+    margin-left:5%;
+    line-height: 45px;
+    color: #333;
+    border:#ececec solid 0.5px;
+    text-align: center;
+    box-sizing: border-box;
+    font-size: 14px;
 }
 </style>

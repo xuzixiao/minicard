@@ -8,7 +8,7 @@
         />
 
     <div class="record">
-        <div v-for="item in frineds" :key="index" v-if="havefrined">
+        <div v-for="item,index in frineds" :key="index" v-if="havefrined">
             <router-link :to="{path:'/page',query:{user:item.mobile}}" class="recordlist">
             <div class="record-hdimg">
                 <img :src="item.headimg==null||item.headimg==''?'static/images/morenheadimg.png':item.headimg" />
@@ -69,10 +69,10 @@ export default {
                 }
             }).then((res)=>{
                 if(res.data.code==100){
-                    if(res.data[0]==null){
-                    this.frineds=[]    
-                    }else{
-                    this.frineds=res.data.data;
+                    for(let i=0;i<res.data.data.length;i++){
+                        if(res.data.data[i]!=null){
+                            this.frineds.push(res.data.data[i])
+                        }
                     }
                 }
             },(err)=>{

@@ -63,7 +63,11 @@ export default {
                 }
             }).then((res)=>{
                 if(res.data.code==100){
-                    this.artlist=res.data.data
+                    for(let i=0;i<res.data.data.length;i++){
+                        if(res.data.data[i]!=null){
+                            this.artlist.push(res.data.data[i]);
+                        }
+                    }
                 }
             },(err)=>{
                 console.log(err);

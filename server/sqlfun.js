@@ -24,7 +24,11 @@ var sqlMap = {
         artlist:"SELECT * FROM article WHERE artcategoryid = ?",
         collart:"update userinfo set collarticle=? where mobile=?",  //收藏文章
         getcollart:"SELECT collarticle FROM userinfo WHERE mobile = ?",//获取收藏的文章
-        readtime:"update article set browse=? where Id=?" //阅读次数
+        readtime:"update article set browse=? where Id=?", //阅读次数,
+        delectsql:"DELETE FROM article WHERE user=? and Id=?",//删除文章
+        getartofupdate:"SELECT * FROM article WHERE user = ? and Id = ?",//获取要修改的文章内容
+        updatearticle:"update article set artbanner=?,artcategoryid=?,arttitle=?,tuijian=?,artcon=? where Id=?",//修改文章
+        delcategory:"DELETE from category where Id = ? and userid = ?" //删除文章分类
     },
     link:{
         setlink:"Insert into link(user,linkname,linkurl,createtime) value(?,?,?,?)",//添加超链接
