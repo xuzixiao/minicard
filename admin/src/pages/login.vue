@@ -8,14 +8,14 @@
                 </el-row>
                 <el-row class="line">
                     <el-col :span="6"><label>用户名</label></el-col>
-                    <el-col :span="18"><el-input v-model="username" placeholder="请输入内容"></el-input></el-col>
+                    <el-col :span="18"><el-input v-model="username" placeholder="请输入用户名"></el-input></el-col>
                 </el-row>
                 <el-row class="line">
                     <el-col :span="6"><label>密码</label></el-col>
-                    <el-col :span="18"><el-input type="password" v-model="userpassword" placeholder="请输入内容"></el-input></el-col>
+                    <el-col :span="18"><el-input type="password" v-model="password" placeholder="请输入密码"></el-input></el-col>
                 </el-row>
                 <el-row>
-                    <el-button type="primary">登录</el-button>
+                    <el-button type="primary" @click="login" class="loginbtn">登录</el-button>
                 </el-row>
             </div>
         </div>
@@ -27,8 +27,51 @@ export default {
     data(){
         return{
             username:"",
-            userpassword:""
+            password:""
         }
+    },
+    methods:{
+        login:function(){
+           if(this.username==""||this.username==""){
+                this.$notify({
+                    title: '警告',
+                    message: '用户名或者密码错误',
+                    type: 'warning',
+                    duration:2000
+                });
+               return;
+           }
+           this.$axios({
+               url:"/login",
+               method:"POST",
+               data:{
+                   username:this.username,
+                   password:this.password
+               }
+           }).then((res)=>{
+               console.log(res);
+               if(res.data.code==100){
+                    this.$message({
+                        message: '登录成功',
+                        type: 'success'
+                    });
+                    this.$store.commit('set_token',res.data.data.token);
+                    this.$router.push("/home");
+               }
+               if(res.data.code==0){
+                   this.$message.error(res.data.msg);
+               }
+
+           },(err)=>{
+               console.log(err);
+           })
+        }
+    },
+    created:function(){
+
+    },
+    mounted:function(){
+        
     }
 }
 </script>
@@ -48,21 +91,22 @@ export default {
 }
 .loginmain{
     width: 400px;
-    height: 270px;
+    height: auto;
     background:rgba(255, 255, 255, .8);
     position:fixed;
     left: 50%;
-    top: 30%;
+    top: 20%;
     margin-left: -200px;
     border-radius: 5px;
     box-shadow: 5px 5px 10px rgba(0,0,0,.3);
 }
 .loginmain h1{
     font-size: 24px;
-    line-height: 60px;
+    line-height: 80px;
+    margin-bottom: 20px;
 }
 .logincon{
-    padding:0px 50px 50px;
+    padding:20px 50px 50px 50px;
 }
 .logincon .line{
     margin-bottom: 15px;
@@ -70,5 +114,9 @@ export default {
 .logincon .line label{
     line-height: 40px;
     font-size: 16px;
+}
+.loginbtn{
+    width: 225px;
+    float:right;
 }
 </style>

@@ -11,7 +11,7 @@ import companyindex from '@/pages/company/index'
 
 Vue.use(Router)
 
-export default new Router({
+var router=new Router({
   routes: [
     {
       path: '/',
@@ -82,3 +82,13 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to,from,next)=>{
+  console.log(to);
+  next();
+})
+
+
+
+
+export default router;

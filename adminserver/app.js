@@ -6,6 +6,17 @@ const controller = require('./controller');
 
 const app = new Koa();
 
+const cors = require('koa2-cors');
+
+app.use(cors({
+    origin:"*",
+    exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+    maxAge: 5,
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'DELETE'],
+    allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
+}))
+
 // log request URL:
 app.use(async (ctx, next) => {
     console.log(`Process ${ctx.request.method} ${ctx.request.url}...`);

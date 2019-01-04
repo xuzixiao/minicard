@@ -1,6 +1,6 @@
 <template>
     <div class="company">
-        <el-form ref="form" :model="form" label-width="80px">
+        <el-form ref="form" :model="company" label-width="80px">
                 <el-row>
                     <el-col :span="8">
                         <el-form-item label="公司名称">
@@ -12,10 +12,23 @@
                 <el-row>
                     <el-col :span="8">
                         <el-form-item label="公司描述">
-                        <el-input v-model="form.desc"></el-input>
+                        <el-input v-model="company.desc"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
+
+                  <el-row>
+                    <el-col :span="8">
+                        <el-form-item label="状态">
+                        <el-input v-model="company.desc"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+
+
+
+
         </el-form>
     </div>
 </template>
@@ -26,7 +39,8 @@ export default {
         return{
            company: {
                 name: '',
-                desc: ''
+                banner:'',
+                state:true
             }
         }
     }
