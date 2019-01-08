@@ -2,12 +2,18 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import login from '@/pages/login'
 import home from '@/pages/home'
-import user from '@/pages/user'
-import article from '@/pages/article'
 import index from '@/pages/index'
+//user
+import user from '@/pages/user'
+import userindex from '@/pages/user/index'
+//article
+import article from '@/pages/article'
+//company
 import company from '@/pages/company'
-import companyadd from '@/pages/company/add'
 import companyindex from '@/pages/company/index'
+import companyadd from '@/pages/company/add'
+import companyupdate from '@/pages/company/update'
+
 
 Vue.use(Router)
 
@@ -15,6 +21,11 @@ var router=new Router({
   routes: [
     {
       path: '/',
+      name: 'main',
+      redirect:'/home/index'
+    },
+    {
+      path: '/login',
       name: 'login',
       component: login
     },
@@ -24,14 +35,16 @@ var router=new Router({
       component: home,
       redirect:'/home/index',
       meta:{
-        title:"首页"
+        title:"首页",
+        requiresAuth:true
       },
       children:[
         {
           path:'index',
           name:'index',
           meta:{
-            title:"主页"
+            title:"主页",
+            requiresAuth:true
           },
           component: index
         },
@@ -39,15 +52,29 @@ var router=new Router({
           path:'user',
           name:'user',
           meta:{
-            title:"用户管理"
+            title:"用户管理",
+            requiresAuth:true
           },
-          component: user
+          component:user,
+          redirect:'/home/user/index',
+          children:[
+            {
+              path:'index',
+              name:'userindex',
+              meta:{
+                title:"用户",
+                requiresAuth:true
+              },
+              component:userindex
+            }
+          ]
         },
         {
           path:'article',
           name:'article',
           meta:{
-            title:"文章管理"
+            title:"文章管理",
+            requiresAuth:true
           },
           component: article
         },
@@ -55,7 +82,8 @@ var router=new Router({
           path:'company',
           name:'company',
           meta:{
-            title:"公司管理"
+            title:"公司管理",
+            requiresAuth:true
           },
           redirect:'/home/company/index',
           component:company,
@@ -64,7 +92,8 @@ var router=new Router({
               path:"index",
               name:"companyindex",
               meta:{
-                title:"公司"
+                title:"公司",
+                requiresAuth:true
               },
               component:companyindex
             },
@@ -72,9 +101,18 @@ var router=new Router({
               path:"add",
               name:"addcompany",
               meta:{
-                title:"添加公司"
+                title:"添加公司",
+                requiresAuth:true
               },
               component:companyadd
+            },{
+              path:"update",
+              name:"updatecompany",
+              meta:{
+                title:"修改公司",
+                requiresAuth:true
+              },
+              component:companyupdate
             }
           ]
         }
@@ -84,8 +122,21 @@ var router=new Router({
 })
 
 router.beforeEach((to,from,next)=>{
-  console.log(to);
-  next();
+  let token=window.sessionStorage.getItem('token');
+  if(to.meta.requiresAuth){//路由验证
+    if(token){//有token
+        next();
+    }else{
+      next({
+        path:"/login",
+        query:{
+          redirect:to.fullPath
+        }
+      })
+    }
+  }else{
+    next();
+  } 
 })
 
 

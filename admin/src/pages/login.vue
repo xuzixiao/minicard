@@ -48,18 +48,19 @@ export default {
                    username:this.username,
                    password:this.password
                }
-           }).then((res)=>{
-               console.log(res);
-               if(res.data.code==100){
+           }).then(({data})=>{
+               console.log(data);
+               if(data.code==100){
                     this.$message({
                         message: '登录成功',
                         type: 'success'
                     });
-                    this.$store.commit('set_token',res.data.data.token);
+                    this.$store.commit('set_token',data.data.token);
+                    this.$store.commit('set_name',data.data.user);
                     this.$router.push("/home");
                }
-               if(res.data.code==0){
-                   this.$message.error(res.data.msg);
+               if(data.code==0){
+                   this.$message.error(data.msg);
                }
 
            },(err)=>{

@@ -14,17 +14,21 @@ var generateToken = function(data){
 
 
 //验证token,最后的res。
+//res=="" 登录失效
+
+
 var verifyToken = function(token){
     let res;
     try{
         let result = jwt.verify(token, secret) || {};
-        console.log(result);
-        let {exp = 0} = result,current = Math.floor(Date.now()/1000);
+        let {exp = 0} = result,
+            current = Math.floor(Date.now()/1000);
         if(current <= exp){
             res = result.data || {};
         }
     }catch(e){
-        console.log(e);
+        res = ''
+        //console.log(e);
     }
     return res;
 }

@@ -56,14 +56,15 @@ export default {
     methods:{
         getlist:function(){
             this.$axios({
-                url:"/companylist",
-                method:"GET"
+                url:"/userlist",
+                method:"POST"
             }).then(({data})=>{
+                console.log(data);
                 if(data.code==100){
                     if(data.data.length>0){
-                        data.data.forEach(item => {
-                            item.state==1?item.state="启用":item.state="禁用";
-                        });
+                        // data.data.forEach(item => {
+                        //     item.state==1?item.state="启用":item.state="禁用";
+                        // });
                         this.tableData=data.data;
                     }else{
                         this.tableData=[];

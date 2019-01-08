@@ -4,15 +4,32 @@
             
             <div class="manage">
                 <ul>
-                   <li>欢迎您!admin</li> 
-                   <li>退出登录</li>
+                   <li>欢迎您!{{user}}</li> 
+                   <li @click="outlogin">退出登录</li>
                 </ul>
             </div>
         </div>
 </template>
 <script>
 export default {
-    
+    data(){
+        return{
+            user:"",
+        }
+    },
+    created:function(){
+        this.user=sessionStorage.getItem('user');
+    },
+    methods:{
+        outlogin:function(){
+           sessionStorage.removeItem("token");
+           sessionStorage.removeItem("user");
+           this.$router.push("/login");
+        }
+    },
+    mounted:function(){
+        
+    }
 }
 </script>
 <style scoped>

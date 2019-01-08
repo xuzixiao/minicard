@@ -12,7 +12,20 @@ import './assets/iconfont/iconfont.css'
 //服务端地址
 let API_HOST=window.location;
 API_HOST.port==""?API_HOST.origin+=":4000":API_HOST=API_HOST.origin.replace(":"+API_HOST.port,":4000");
-//默认挂载地址
+
+//默认header内添加token
+Axios.interceptors.request.use(config=>{
+   const token = sessionStorage.getItem("token");
+   if(token){
+     config.headers.Authorization =token;
+   }
+   return config;
+},error=>{
+  return Promise.reject(error);
+})
+
+
+
 Axios.defaults.baseURL = API_HOST;
 Vue.prototype.$axios=Axios;
 

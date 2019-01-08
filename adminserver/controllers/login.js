@@ -35,7 +35,7 @@ var login= async(ctx,next)=>{
         })        
     }else if(queryresult[0].password!=ctx.request.body.password){
         ctx.response.body={
-            code:100,
+            code:0,
             data:{
                 user:ctx.request.body.username
             },
@@ -50,5 +50,4 @@ var Glogin= async(ctx,next)=>{
 
 module.exports={
     'POST /login':login,
-    'GET /login':Glogin
 }

@@ -48,7 +48,7 @@
                 </el-row>
                 
                 <el-row class="form-btn">
-                    <el-button type="primary" @click="savecompany">保存公司</el-button>
+                    <el-button type="primary" @click="savecompany">保存修改</el-button>
                 </el-row>
 
         </el-form>
@@ -59,6 +59,7 @@
 export default {
     data(){
         return{
+            id:"",
            company: {
                 name: '',
                 desc:"",
@@ -72,9 +73,6 @@ export default {
         expiration:function(){
             return this.company.exptime+ this.company.exptype;
         }
-    },
-    created:function(){
-      
     },
     methods:{
         savecompany:function(){
@@ -101,14 +99,16 @@ export default {
                 return;
             }
             
+            let updatedata=this.company;
+            updatedata.id=this.id;
             this.$axios({
-                url:"/addcompany",
+                url:"/updatecompany",
                 method:"POST",
-                data:this.company,
+                data:updatedata,
             }).then(({data})=>{
                 if(data.code==100){
                     this.$notify({
-                        message: '添加成功',
+                        message: '修改成功',
                         type: 'success'
                     }); 
                     var that=this;
@@ -127,7 +127,7 @@ export default {
                         that.$router.push({
                             path:"/login",
                             query:{
-                                redirect:"/home/company/add"
+                                redirect:"/home/company/update"
                             }
                         })
                     },800)
@@ -141,7 +141,31 @@ export default {
             }).catch((err)=>{
                 console.log(err)
             })
+        },
+        getcompanyinfo:function(){
+           this.$axios({
+               url:"/getupdateinfo",
+               method:"POST",
+               data:{
+                   id:this.id
+               }
+           }).then(({data})=>{
+               console.log(data);
+               if(data.code==100){
+                   this.company.name=data.data[0].name;
+                   this.company.desc=data.data[0].depict;
+                   this.company.state=data.data[0].state==1?true:false;
+                   this.company.exptime=data.data[0].exptime;
+                   this.company.exptype=data.data[0].exptype;
+               }
+           }).catch((err)=>{
+               console.log(err);
+           })
         }
+    },
+    created:function(){
+        this.id=this.$route.query.id
+        this.getcompanyinfo(); 
     }
 }
 </script>
