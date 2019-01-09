@@ -9,7 +9,8 @@ import Vant from 'vant'
 import Cookie from './cookie'
 import 'vant/lib/index.css'
 
-const API_HOST=window.location.origin+":3000";
+let API_HOST;
+window.location.port==""?API_HOST=window.location.origin+":4000":API_HOST=window.location.origin.replace(":"+window.location.port,":4000");
 
 Axios.defaults.baseURL = API_HOST;
 Axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';

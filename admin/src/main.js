@@ -10,8 +10,8 @@ import './assets/iconfont/iconfont.css'
 
 
 //服务端地址
-let API_HOST=window.location;
-API_HOST.port==""?API_HOST.origin+=":4000":API_HOST=API_HOST.origin.replace(":"+API_HOST.port,":4000");
+let API_HOST;
+window.location.port==""?API_HOST=window.location.origin+":4000":API_HOST=window.location.origin.replace(":"+window.location.port,":4000");
 
 //默认header内添加token
 Axios.interceptors.request.use(config=>{
