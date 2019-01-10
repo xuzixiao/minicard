@@ -99,7 +99,6 @@ export default {
                     userid:this.userid
                 }
             }).then(({data})=>{
-                console.log(data);
                 if(data.code==100){
                     this.userinfo=data.data[0]
                 }else if(data.code==10){
@@ -122,7 +121,6 @@ export default {
             })
         },
         changeuserstatus:function(status){
-            //console.log(status+""+this.userid);
             this.$axios({
                 url:"/changeuserstatus",
                 method:"POST",
@@ -131,7 +129,27 @@ export default {
                     status:status
                 }
             }).then(({data})=>{
-                console.log(data);
+                if(data.code==100){
+                    this.$notify({
+                        message: '操作成功',
+                        type: 'success'
+                    }); 
+                    this.getdetail();
+                }else if(data.code==10){
+                    this.$notify({
+                        message: '登录失效',
+                        type: 'success'
+                    }); 
+                    var that=this;
+                    setTimeout(function(){
+                        that.$router.push({
+                            path:"/login",
+                            query:{
+                                redirect:"/home/user"
+                            }
+                        })
+                    },800)
+                }
             }).catch((err)=>{
                 console.log(err);
             })

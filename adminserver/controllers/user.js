@@ -1,6 +1,7 @@
 const usermodel=require('../config/mysql');
 const jwtfun=require('../untils/methods');
 
+//获取用户列表
 var userlist=async(ctx,next)=>{
     let token=ctx.request.headers.authorization;
     let tokenobj=jwtfun.verifyToken(token);
@@ -24,7 +25,7 @@ var userlist=async(ctx,next)=>{
         }
     })
 }
-
+//获取用户id详情信息
 var getuserinfo=async(ctx,next)=>{
     let token=ctx.request.headers.authorization;
     let tokenobj=jwtfun.verifyToken(token);
@@ -56,7 +57,7 @@ var getuserinfo=async(ctx,next)=>{
             }
     })
 }
-
+// 用户状态管理
 var changeuserstatus=async(ctx,next)=>{
     let token=ctx.request.headers.authorization;
     let tokenobj=jwtfun.verifyToken(token);

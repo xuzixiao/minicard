@@ -19,6 +19,7 @@ let query = (sql, values) => {
         })
     })
 };
+//-------------------------登录-----------------
 //用户登录
 exports.loginxcheck = (user)=>{
     let sql='SELECT password FROM admin WHERE Account = ?';
@@ -29,6 +30,7 @@ exports.updatetoken =(token,user)=>{
     let sql='UPDATE admin SET token=? where Account=?'
     return query(sql,[token,user]);
 }
+//------------------------公司------------------
 //添加公司
 exports.addcompany=(item_no,name,desc,state,exptime,exptype,expiration_date,createtime)=>{
     let sql='Insert into company(item_no,name,depict,state,exptime,exptype,expiration_date,createtime) value(?,?,?,?,?,?,?,?)'
@@ -51,6 +53,7 @@ exports.updatecompany=(name,desc,state,exptime,exptype,expiration_date,id)=>{
     return query(sql,[name,desc,state,exptime,exptype,expiration_date,id])
 }
 
+//-------------------------用户-------------------
 //用户列表
 exports.getuserinfo=()=>{
     let sql="SELECT * FROM userinfo";
@@ -67,6 +70,22 @@ exports.changeuserstatus=(status,Id)=>{
     return query(sql,[status,Id]);
 }
 
+//-------------------------文章-------------------
+//文章列表
+exports.articlelist=()=>{
+    let sql="SELECT article.*,category.categoryname,artstatus.statename FROM (article left join category on article.artcategoryid=category.id) left join artstatus on article.status=artstatus.state";
+    return query(sql);
+}
+//文章详情 文章id
+exports.articledetail=(id)=>{
+    let sql="SELECT article.*,category.categoryname,artstatus.statename FROM (article left join category on article.artcategoryid=category.id) left join artstatus on article.status=artstatus.state WHERE article.Id=?";
+    return query(sql,id)
+}
+//文章状态 文章id
+exports.articlestatus=(state,id)=>{
+    let sql="update article set status=? where Id=?";
+    return query(sql,[state,id]);
+}
 
 
 

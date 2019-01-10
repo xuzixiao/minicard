@@ -9,6 +9,8 @@ import userindex from '@/pages/user/index'
 import userdetail from '@/pages/user/detail'
 //article
 import article from '@/pages/article'
+import articleindex from '@/pages/article/index'
+import articledetail from '@/pages/article/detail'
 //company
 import company from '@/pages/company'
 import companyindex from '@/pages/company/index'
@@ -85,7 +87,27 @@ var router=new Router({
             title:"文章管理",
             requiresAuth:true
           },
-          component: article
+          component: article,
+          redirect:"/home/article/index",
+          children:[
+            {
+              path:"index",
+              name:"articleindex",
+              meta:{
+                title:"文章",
+                requiresAuth:true
+              },
+              component: articleindex,
+            },{
+              path:'detail',
+              name:'articledetail',
+              meta:{
+                title:"文章详情",
+                requiresAuth:true
+              },
+              component:articledetail
+            }
+          ]
         },
         {
           path:'company',

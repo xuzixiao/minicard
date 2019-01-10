@@ -1,31 +1,34 @@
 <template>
     <div class="company">
        <el-row>
+        <el-col class="manage-btn">
+            <el-button>添加文章</el-button>
+            <el-button>添加文章</el-button>
+        </el-col>
         <el-col :span="24">
-
             <el-table :data="tableData" border width='500' class="companylist">
                 <el-table-column
-                    prop="userno"
-                    label="用户编号"
-                    width="100">
+                    prop="arttitle"
+                    label="文章标题"
+                    width="300">
                 </el-table-column>
                 <el-table-column
-                    label="头像"
-                    width="80">
+                    label="封面图"
+                    width="120">
                     <template slot-scope="scope">
-                        <div class="userlogo">
-                            <img :src="scope.row.headimg==''||scope.row.headimg==null?$Filepath+'/uploadfile/nothave.jpg':$Filepath+scope.row.headimg" />
+                        <div class="bannerimg">
+                            <img :src="scope.row.artbanner==''||scope.row.artbanner==null?$Filepath+'/uploadfile/nothave.jpg':$Filepath+scope.row.artbanner" />
                         </div>
                     </template>
                 </el-table-column>
                 <el-table-column
-                    prop="name"
-                    label="用户名"
-                    width="100">
+                    prop="user"
+                    label="用户"
+                    width="130">
                 </el-table-column>
                 <el-table-column
-                    prop="mobile"
-                    label="手机号"
+                    prop="categoryname"
+                    label="文章分类"
                     width="150">
                 </el-table-column>
                 <el-table-column
@@ -38,7 +41,7 @@
                     label="创建时间"
                     width="200">
                 </el-table-column>
-                 <el-table-column
+                <el-table-column
                     label="操作">
                     <template slot-scope="scope">
                         <el-button type="text" size="small" @click="godetail(scope.row.Id)">查看详情</el-button>
@@ -68,15 +71,16 @@ export default {
     methods:{
         getlist:function(){
             this.$axios({
-                url:"/userlist",
+                url:"/articlelist",
                 method:"POST"
             }).then(({data})=>{
+                console.log(data);
                 if(data.code==100){
                     if(data.data.length>0){
-                       data.data.forEach(item => {
-                            item.status==1?item.status="启用":item.status="禁用";
-                            item.createtime=item.createtime.split(".")[0];
-                        });
+                    //    data.data.forEach(item => {
+                    //         item.status==1?item.status="启用":item.status="禁用";
+                    //         item.createtime=item.createtime.split(".")[0];
+                    //     });
                         this.tableData=data.data;
                     }else{
                         this.tableData=[];
@@ -101,6 +105,8 @@ export default {
             })
         },
         godetail:function(id){
+            console.log(id);
+            return;
             this.$router.push({
                 path:"/home/user/detail",
                 query:{
@@ -137,17 +143,20 @@ export default {
 .page{
     margin: 10px 0px;
 }
-.userlogo{
-    width: 50px;
-    height: 50px;
+.bannerimg{
+    width: 100px;
+    height: auto;
     display: flex;
     align-items: center;
-    border-radius: 50%;
-    overflow: hidden;
 }
-.userlogo img{
-    height: 100%;
-    width: 100%;
+.bannerimg img{
+    display: block;
+    height:auto;
+    width: 100px;
+}
+.manage-btn{
+ padding:  0px 0px 10px 10px;
+ display: flex;
 }
 
 </style>
