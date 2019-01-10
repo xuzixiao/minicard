@@ -66,6 +66,6 @@ export default {
     padding: 0px!important;
 }
 .Maincontent{
-    flex-direction:column;
+    flex-direction:column!important;
 }
 </style>
