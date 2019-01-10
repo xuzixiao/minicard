@@ -6,6 +6,7 @@ import index from '@/pages/index'
 //user
 import user from '@/pages/user'
 import userindex from '@/pages/user/index'
+import userdetail from '@/pages/user/detail'
 //article
 import article from '@/pages/article'
 //company
@@ -66,6 +67,14 @@ var router=new Router({
                 requiresAuth:true
               },
               component:userindex
+            },{
+              path:'detail',
+              name:'userdetail',
+              meta:{
+                title:"用户详情",
+                requiresAuth:true
+              },
+              component:userdetail
             }
           ]
         },

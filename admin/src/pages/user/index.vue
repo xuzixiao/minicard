@@ -2,34 +2,46 @@
     <div class="company">
        <el-row>
         <el-col :span="24">
-            <div class="handerbtn">
-                <router-link to="/home/company/add">
-                    <el-button>添加公司</el-button>
-                </router-link>
-            </div>
-        </el-col>
-        <el-col :span="24">
-            <el-table :data="tableData" border class="companylist">
+
+            <el-table :data="tableData" border width='500' class="companylist">
                 <el-table-column
-                    prop="item_no"
-                    label="公司编号"
-                    width="150">
+                    prop="userno"
+                    label="用户编号"
+                    width="100">
+                </el-table-column>
+                <el-table-column
+                    label="头像"
+                    width="80">
+                    <template slot-scope="scope">
+                        <div class="userlogo">
+                            <img :src="scope.row.headimg==''||scope.row.headimg==null?$Filepath+'/uploadfile/nothave.jpg':$Filepath+scope.row.headimg" />
+                        </div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                     prop="name"
-                    label="公司名称">
+                    label="用户名"
+                    width="100">
                 </el-table-column>
                 <el-table-column
-                    prop="state"
+                    prop="mobile"
+                    label="手机号"
+                    width="150">
+                </el-table-column>
+                <el-table-column
+                    prop="status"
                     label="当前状态"
+                    width="150">
+                </el-table-column>
+                <el-table-column
+                    prop="createtime"
+                    label="创建时间"
                     width="200">
                 </el-table-column>
-                <el-table-column
-                    prop="state"
-                    label="操作"
-                    width="100">
+                 <el-table-column
+                    label="操作">
                     <template slot-scope="scope">
-                        <el-button type="text" size="small" @click="update(scope.row.Id)">编辑</el-button>
+                        <el-button type="text" size="small" @click="godetail(scope.row.Id)">查看详情</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -62,9 +74,10 @@ export default {
                 console.log(data);
                 if(data.code==100){
                     if(data.data.length>0){
-                        // data.data.forEach(item => {
-                        //     item.state==1?item.state="启用":item.state="禁用";
-                        // });
+                       data.data.forEach(item => {
+                            item.status==1?item.status="启用":item.status="禁用";
+                            item.createtime=item.createtime.split(".")[0];
+                        });
                         this.tableData=data.data;
                     }else{
                         this.tableData=[];
@@ -79,7 +92,7 @@ export default {
                         that.$router.push({
                             path:"/login",
                             query:{
-                                redirect:"/home/company"
+                                redirect:"/home/user"
                             }
                         })
                     },800)
@@ -88,9 +101,9 @@ export default {
                 console.log(err);
             })
         },
-        update:function(id){
+        godetail:function(id){
             this.$router.push({
-                path:"/home/company/update",
+                path:"/home/user/detail",
                 query:{
                     id:id
                 }
@@ -111,6 +124,7 @@ export default {
     width: 100%;
     height: auto;
     background: #ffffff;
+    padding: 10px 0px;
 }
 .handerbtn{
     padding: 10px;
@@ -123,6 +137,18 @@ export default {
 }
 .page{
     margin: 10px 0px;
+}
+.userlogo{
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.userlogo img{
+    height: 100%;
+    width: 100%;
 }
 
 </style>

@@ -9,14 +9,9 @@
             <el-aside width="200px">
                 <menu-unit></menu-unit>
             </el-aside>
-            <el-container>
-                <el-main>
-                    <breadcrumb></breadcrumb>
-                    <div class="content">
-                        <router-view>
-                        </router-view>
-                    </div>
-                </el-main>
+            <el-container class="Maincontent">
+                <breadcrumb></breadcrumb>
+                <el-main><div class="content"><router-view></router-view></div></el-main>
             </el-container>
         </el-container>
     </el-container>
@@ -65,8 +60,12 @@ export default {
 .content{
     background: #f2f3f7;
     padding: 0px;
+    overflow: auto;
 }
 .el-main{
-    padding: 0px;
+    padding: 0px!important;
+}
+.Maincontent{
+    flex-direction:column;
 }
 </style>

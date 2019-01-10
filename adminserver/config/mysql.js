@@ -56,9 +56,16 @@ exports.getuserinfo=()=>{
     let sql="SELECT * FROM userinfo";
     return query(sql)
 }
-
-
-
+//根据id 查询用户信息
+exports.getuserinfobyid=(id)=>{
+    let sql="SELECT * FROM userinfo where Id=?"
+    return query(sql,id);
+}
+//根据id 禁用/启用 用户 操作 status
+exports.changeuserstatus=(status,Id)=>{
+    let sql="update userinfo set status=? where Id=?"
+    return query(sql,[status,Id]);
+}
 
 
 
