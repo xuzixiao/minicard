@@ -58,7 +58,6 @@ export default {
     background: #333;
 }
 .content{
-    background: #f2f3f7;
     padding: 0px;
     overflow: auto;
 }

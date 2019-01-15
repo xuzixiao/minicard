@@ -1,6 +1,6 @@
 const usermodel=require('../config/mysql');
 const jwtfun=require('../untils/methods');
-
+const crypto=require('../untils/crypto');
 
 var login= async(ctx,next)=>{ 
     let queryresult;
@@ -8,6 +8,19 @@ var login= async(ctx,next)=>{
     await usermodel.loginxcheck(ctx.request.body.username).then(res=>{
         queryresult=res;
     })
+    console.log(queryresult[0])
+
+    if(queryresult[0].state==0){
+        ctx.response.body={
+            code:0,
+            data:{
+                user:ctx.request.body.username
+            },
+            msg:"当前账号无权限登录"
+        }
+        return;
+    }
+
     //登录验证
     if(queryresult.length==0){
         ctx.response.body={
@@ -17,7 +30,7 @@ var login= async(ctx,next)=>{
             },
             msg:"当前用户未注册"
         }
-    }else if(queryresult[0].password==ctx.request.body.password){
+    }else if(queryresult[0].password==crypto.aesEncrypt(ctx.request.body.password)){
         //updatetoken
         var tokenobj={
             username:ctx.request.body.username
@@ -33,7 +46,7 @@ var login= async(ctx,next)=>{
                 msg:"登录成功"
             }
         })        
-    }else if(queryresult[0].password!=ctx.request.body.password){
+    }else if(queryresult[0].password!=crypto.aesEncrypt(ctx.request.body.password)){
         ctx.response.body={
             code:0,
             data:{
@@ -42,10 +55,6 @@ var login= async(ctx,next)=>{
             msg:"密码错误"
         }
     }
-}
-
-var Glogin= async(ctx,next)=>{
-    ctx.response.body="sdfd";
 }
 
 module.exports={
