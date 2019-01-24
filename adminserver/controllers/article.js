@@ -155,6 +155,69 @@ var updateartstatus=async(ctx,next)=>{
         }
     }) 
 }
+//---------------------公司文章接口----------------
+//保存文章
+var savecompanyarticle=async(ctx,next)=>{
+    let token=ctx.request.headers.authorization;
+    let tokenobj=jwtfun.verifyToken(token);
+    if(tokenobj==""){
+        ctx.response.body={
+            code:10,
+            msg:"登录失效" 
+        }
+        return;
+    }
+    var params=ctx.request.body;
+
+    var createtime=new Date();
+    await model.savecompanyart(params.title,params.artlogo,params.content,createtime).then((res)=>{
+        ctx.response.body={
+            code:100,
+            data:"保存成功"
+        }
+    }),(err)=>{
+        ctx.response.body={
+            code:0,
+            data:err
+        }
+    }
+}
+//获取公司文章列表
+var getcompanyarticle=async(ctx,next)=>{
+    await model.getcompanyartlist().then((res)=>{
+        ctx.response.body={
+            code:100,
+            data:res 
+        }
+    }).catch(err=>{
+        ctx.response.body={
+            code:0,
+            data:err 
+        }
+    })
+}
+//获取公司文章内容
+var getcompanyarticlecontent=async(ctx,next)=>{
+    let id=ctx.request.body.Id;
+    if(id==""||id==null){
+        ctx.response.body={
+            code:0,
+            data:"参数有误" 
+        }
+        return;
+    }
+    await model.getcompanyartcomtent(id).then((res)=>{
+        ctx.response.body={
+            code:100,
+            data:res 
+        }
+    }).catch(err=>{
+        ctx.response.body={
+            code:0,
+            data:err 
+        }
+    })
+}
 
 
 
@@ -164,5 +227,9 @@ module.exports = {
     'POST /getarticleinfo':getarticleinfo,
     'POST /changearticlestatus':changearticlestatus,
     'POST /getacticle':getacticlebyid,
-    'POST /updateartstatus':updateartstatus
+    'POST /updateartstatus':updateartstatus,
+    //公司文章接口
+    'POST /savecompanyarticle':savecompanyarticle,
+    'POST /getcompanyarticle':getcompanyarticle,
+    'POST /getcompanyarticlecontent':getcompanyarticlecontent
 };

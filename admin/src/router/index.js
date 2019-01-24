@@ -11,6 +11,7 @@ import userdetail from '@/pages/user/detail'
 import article from '@/pages/article'
 import articleindex from '@/pages/article/index'
 import articledetail from '@/pages/article/detail'
+import articlewrite from '@/pages/article/write'
 //company
 import company from '@/pages/company'
 import companyindex from '@/pages/company/index'
@@ -106,6 +107,14 @@ var router=new Router({
                 requiresAuth:true
               },
               component:articledetail
+            },{
+              path:'write',
+              name:'articlewrite',
+              meta:{
+                title:"写文章",
+                requiresAuth:true
+              },
+              component:articlewrite
             }
           ]
         },

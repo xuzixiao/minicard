@@ -1,5 +1,5 @@
 <template>
-    <div class="company">
+    <div class="company"> 
        <el-row>
         <el-col :span="24">
             <div class="handerbtn">
@@ -22,12 +22,12 @@
                 <el-table-column
                     prop="state"
                     label="当前状态"
-                    width="200">
+                    width="100">
                 </el-table-column>
                 <el-table-column
                     prop="state"
                     label="操作"
-                    width="100">
+                    width="200">
                     <template slot-scope="scope">
                         <el-button type="text" size="small" @click="update(scope.row.Id)">编辑</el-button>
                     </template>

@@ -17,9 +17,23 @@
     "url": ""
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "crypto": "^1.0.1",
+    "is-generator-function": "^1.0.7",
     "jsonwebtoken": "^8.4.0",
     "koa": "2.0.0",
+    "koa-body": "^4.0.6",
     "koa-bodyparser": "3.2.0",
-    "koa-router": "7.0.0"
+    "koa-is-json": "^1.0.0",
+    "koa-router": "7.0.0",
+    "koa-static": "^5.0.0",
+    "koa2-cors": "^2.0.6",
+    "koa2-ueditor": "^1.1.2",
+    "mime-types": "^2.1.21",
+    "mysql": "^2.16.0",
+    "on-finished": "^2.3.0",
+    "superagent": "^4.1.0",
+    "ueditor": "^1.2.3",
+    "ueditor-nodejs": "^0.2.0"
   }
 }

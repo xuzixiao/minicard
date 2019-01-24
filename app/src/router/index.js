@@ -39,13 +39,18 @@ import adminmain from '@/admin/main'
 import artcategory from '@/pages/artcategory'
 //文章内容页
 import article from '@/pages/article'
+
+//公司文章内容页
+import companyarticle from '@/pages/companyarticle'
+
 //文章列表
 import artlist from '@/pages/artlist'
 //修改文章
 import updatearticle from '@/pages/updatearticle'
 //修改成我的文章
 import makeittome from '@/pages/makeittome'
-
+//公司文章列表
+import companyartlist from '@/pages/companyartlist'
 
 
 Vue.use(Router)
@@ -164,6 +169,12 @@ const router = new Router({
     //   meta: { requireAuth: true }
     // },
     {
+      path: '/companyartlist',
+      name: 'companyartlist',
+      component: companyartlist,
+      meta: { requireAuth: true }
+    },
+    {
       path: '/artcategory',
       name: 'artcategory',
       component: artcategory,
@@ -173,7 +184,14 @@ const router = new Router({
       name: 'article',
       component: article,
       meta: { requireAuth: false }
-    },{
+    },
+    {
+      path:"/companyarticle",
+      name:"companyarticle",
+      component:companyarticle,
+      meta:{requireAuth:false}
+    },
+    {
       path: '/artlist',
       name: 'artlist',
       component: artlist,
