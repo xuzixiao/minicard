@@ -12,12 +12,17 @@ import 'vant/lib/index.css'
 let API_HOST;
 window.location.port==""?API_HOST=window.location.origin+":3000":API_HOST=window.location.origin.replace(":"+window.location.port,":3000");
 
+let File_Path;
+window.location.port==""?File_Path=window.location.origin+":4000":File_Path=window.location.origin.replace(":"+window.location.port,":4000");
+
+
 Axios.defaults.baseURL = API_HOST;
 Axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 Vue.prototype.$axios=Axios;
 Vue.prototype.$cookie=Cookie;
 Vue.prototype.$HOST=API_HOST;
+Vue.prototype.$File_Path=File_Path;
 Vue.config.productionTip = false
 Vue.use(Vant)
 

@@ -8,19 +8,6 @@ var login= async(ctx,next)=>{
     await usermodel.loginxcheck(ctx.request.body.username).then(res=>{
         queryresult=res;
     })
-    console.log(queryresult[0])
-
-    if(queryresult[0].state==0){
-        ctx.response.body={
-            code:0,
-            data:{
-                user:ctx.request.body.username
-            },
-            msg:"当前账号无权限登录"
-        }
-        return;
-    }
-
     //登录验证
     if(queryresult.length==0){
         ctx.response.body={
@@ -31,6 +18,17 @@ var login= async(ctx,next)=>{
             msg:"当前用户未注册"
         }
     }else if(queryresult[0].password==crypto.aesEncrypt(ctx.request.body.password)){
+        //判断有没有权限登录
+        if(queryresult[0].state==0){
+            ctx.response.body={
+                code:0,
+                data:{
+                    user:ctx.request.body.username
+                },
+                msg:"当前账号无权限登录"
+            }
+            return;
+        }
         //updatetoken
         var tokenobj={
             username:ctx.request.body.username

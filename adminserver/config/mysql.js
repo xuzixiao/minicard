@@ -111,6 +111,22 @@ exports.articlestatus=(state,id)=>{
     return query(sql,[state,id]);
 }
 
+//---------------------公司文章--------------
+//保存公司文章
+exports.savecompanyart=(title,artlogo,content,createtime)=>{
+    let sql="Insert into company_art(title,artlogo,content,createtime) value(?,?,?,?)";
+    return query(sql,[title,artlogo,content,createtime])
+}
+//获取公司文章列表
+exports.getcompanyartlist=()=>{
+    let sql="SELECT * FROM company_art";
+    return query(sql);
+}
+//获取公司文章内容
+exports.getcompanyartcomtent=(id)=>{
+    let sql="SELECT * FROM company_art where Id=?";
+    return query(sql,id);
+}
 
 
 

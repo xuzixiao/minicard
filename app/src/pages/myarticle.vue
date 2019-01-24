@@ -21,6 +21,14 @@
 
     <div v-cloak class="art-list"  v-if="havecategory">
         <van-row gutter='10'>
+
+              <van-col span="8" class="list">
+                <div class="navlist" @click="companyartlist">
+                    <van-icon name="tosend" />
+                    <p>公司文章</p>
+                </div>
+            </van-col>
+
             <van-col span="8" v-for="(item,index) in category" :key="index" class="list">
                 <van-icon name="delete" class="delthis" @click="delthiscategory(item.id)" />
                 <div class="navlist" @click="choosecategory(item.id,item.categoryname)">
@@ -173,6 +181,15 @@ export default {
             }).catch(() => {
             // on cancel
             });
+        },
+        companyartlist:function(){
+            this.$router.push({
+                path:"/companyartlist",
+                // query:{
+                //     categoryid:id,
+                //     categoryname:categoryname
+                // }
+            })
         }
     },
     created:function(){

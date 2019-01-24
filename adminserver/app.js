@@ -6,8 +6,6 @@ const static=require('koa-static');
 const controller = require('./controller');
 const app = new Koa();
 const cors = require('koa2-cors');
-
-
 //解决跨域问题
 app.use(cors({
     origin:"*",
@@ -26,7 +24,7 @@ app.use(static(
 app.use(async (ctx, next) => {
     console.log(`Process ${ctx.request.method} ${ctx.request.url}...`);
     await next();
-});
+});clearImmediate
 // parse request body:
 // app.use(bodyParser());
 app.use(koaBody({
@@ -40,7 +38,6 @@ app.use(koaBody({
         }
     }
 }))
-
 // add controllers:
 app.use(controller());
 

@@ -34,8 +34,8 @@ Axios.defaults.baseURL = API_HOST;
 Vue.prototype.$axios=Axios;
 
 //挂载文件跟目录
-Vue.prototype.$Filepath=Filepath;
-Vue.prototype.$File=API_HOST;
+Vue.prototype.$Filepath=Filepath;//3000
+Vue.prototype.$File=API_HOST;//4000
 //挂载默认图片
 Vue.prototype.$Defaultimg=Defaultimg;
 //挂载上传接口
