@@ -15,7 +15,6 @@ window.location.port==""?API_HOST=window.location.origin+":3000":API_HOST=window
 let File_Path;
 window.location.port==""?File_Path=window.location.origin+":4000":File_Path=window.location.origin.replace(":"+window.location.port,":4000");
 
-
 Axios.defaults.baseURL = API_HOST;
 Axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
